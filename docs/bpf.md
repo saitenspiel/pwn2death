@@ -93,7 +93,7 @@ BPF 最早的内核实现是 2.1.75 版本的 [/net/core/filter.c](https://elixi
 - 如果本 pass 与上一 pass 生成的 native code 长度相同，表明编译成功，放入 module_alloc() 的内存中；如果始终不收敛，放弃编译；
 - 通过 [SK_RUN_FILTER](https://elixir.bootlin.com/linux/v3.0/source/include/linux/filter.h#L163) 宏调用 [sk_filter-> bpf_func](https://elixir.bootlin.com/linux/v3.0/source/include/linux/filter.h#L142)，如果编译成功，该函数指针指向生成的 native code，否则指向 [sk_run_filter()](https://elixir.bootlin.com/linux/v3.0/source/net/core/filter.c#L112)。
 
-函数指针 bpf_func 让 BPF 可以方便地迁移到其他场景，不再局限于 socket 上的过滤。内核 3.4 起，BPF 应用于系统调用的过滤 [seccomp](/todo)。
+函数指针 bpf_func 让 BPF 可以方便地迁移到其他场景，不再局限于 socket 上的过滤。内核 3.4 起，BPF 应用于系统调用的过滤 [seccomp](../todo)。
 
 ## eBPF
 eBPF 最开始是作为一种中间表示在 3.15 引入，使用全新的指令集。BPF 程序加载到内核时，优先进行 JIT 编译，如果编译失败，则调用 [sk_convert_filter()](https://elixir.bootlin.com/linux/v3.15/source/net/core/filter.c#L863) 将其转化为中间表示，之后通过 [__sk_run_filter()](https://elixir.bootlin.com/linux/v3.15/source/net/core/filter.c#L141) 运行。
@@ -159,15 +159,15 @@ eBPF map 是位于内核的 Key-Value 存储，eBPF 程序借此与用户空间�
 - 用户进程通过系统调用 bpf() 管理 map 并访问其数据；
 - 运行在内核的 eBPF 程序通过 helper 函数访问 map 数据。
 
-Map 类似一个 Key-Value 版本的 [VFS](/todo)，底层有不同类型（[bpf_map_type](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/bpf.h#L867)）的实现。基本类型是数组和哈希表，可以当槽用，如：
+Map 类似一个 Key-Value 版本的 [VFS](../todo)，底层有不同类型（[bpf_map_type](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/bpf.h#L867)）的实现。基本类型是数组和哈希表，可以当槽用，如：
 
 - [PROG_ARRAY](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/arraymap.c#L1087) 存储 eBPF 程序的地址，用于 tail call；
 - [ARRAY_OF_MAPS](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/arraymap.c#L1317)/[HASH_OF_MAPS](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/hashtab.c#L2231) 存储 map 的地址。
 
-另外有 [LPM_TRIE](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/lpm_trie.c#L721) 实现了 trie 树，可用于路由转发等前缀匹配场景。各类型 map 的可用操作不完全相同，通过结构体 [bpf_map_ops](https://elixir.bootlin.com/linux/v5.13/source/include/linux/bpf.h#L61) 声明。按 key 查找、更新和删除这三个核心操作需要请求 [RCU 锁](/todo)。
+另外有 [LPM_TRIE](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/lpm_trie.c#L721) 实现了 trie 树，可用于路由转发等前缀匹配场景。各类型 map 的可用操作不完全相同，通过结构体 [bpf_map_ops](https://elixir.bootlin.com/linux/v5.13/source/include/linux/bpf.h#L61) 声明。按 key 查找、更新和删除这三个核心操作需要请求 [RCU 锁](../todo)。
 
 ### 文件系统
-创建 map 即生成一个 [匿名 inode](/todo) 并返回其文件描述符 fd，之后用户进程通过 fd 操作 map。一旦 fd 关闭，对应 map 就会丢失。为了延长 map 的生命周期，让不同进程能共享该 map，允许将其写入一个内存文件系统，供之后的进程访问。
+创建 map 即生成一个 [匿名 inode](../todo) 并返回其文件描述符 fd，之后用户进程通过 fd 操作 map。一旦 fd 关闭，对应 map 就会丢失。为了延长 map 的生命周期，让不同进程能共享该 map，允许将其写入一个内存文件系统，供之后的进程访问。
 
 该文件系统在 [inode.c](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/inode.c) 中定义，支持软硬链接，默认挂载点 /sys/fs/bpf，读写操作封装为 bpf() 命令：
 
@@ -180,7 +180,7 @@ eBPF 程序也一样，加载到内核时生成 fd，通过写入文件系统分
 - 加载 map 地址到寄存器：Verifier 在 [resolve_pseudo_ldimm64()](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/verifier.c#L11220) 时，将 [BPF_LD_MAP_FD](https://elixir.bootlin.com/linux/v5.13/source/include/linux/filter.h#L202) 指令中的 fd 重写为 map 地址。编写 eBPF 程序时只用给出目标 map 的 fd。 
 
 ### 主程序
-eBPF 程序有特定的类型 [bpf_prog_type](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/bpf.h#L908)，通过 [bpf_prog_load()](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/syscall.c#L2079) 加载到内核 vmalloc() 的内存，然后通过 setsockopt() 等方式附加到特定数据结构。部分类型，主要是 [cgroup](/todo) 相关，附加操作没有用户空间接口，对此 bpf() 提供 BPF_PROG_ATTACH 命令，可附加 eBPF 程序到 [bpf_attach_type](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/bpf.h#L942) 中指示的数据结构。
+eBPF 程序有特定的类型 [bpf_prog_type](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/bpf.h#L908)，通过 [bpf_prog_load()](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/syscall.c#L2079) 加载到内核 vmalloc() 的内存，然后通过 setsockopt() 等方式附加到特定数据结构。部分类型，主要是 [cgroup](../todo) 相关，附加操作没有用户空间接口，对此 bpf() 提供 BPF_PROG_ATTACH 命令，可附加 eBPF 程序到 [bpf_attach_type](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/bpf.h#L942) 中指示的数据结构。
 
 eBPF 程序通过 [bpf_prog->bpf_func](https://elixir.bootlin.com/linux/v5.13/source/include/linux/filter.h#L570) 执行：
 
@@ -221,7 +221,7 @@ tail call 严格来说不算过程调用。它相当于一个到目标 eBPF 程�
 
 PROG_ARRAY 记录的是结构体 [bpf_prog](https://elixir.bootlin.com/linux/v5.13/source/include/linux/filter.h#L550) 的地址：
 
-- JIT 编译器从中取出 bpf_func，通过 [retpoline](/todo)，即 [RETPOLINE_RCX_BPF_JIT()](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/asm/nospec-branch.h#L328) 宏跳转到该地址；
+- JIT 编译器从中取出 bpf_func，通过 [retpoline](../todo)，即 [RETPOLINE_RCX_BPF_JIT()](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/asm/nospec-branch.h#L328) 宏跳转到该地址；
 - 解释器从中取出 eBPF 指令序列，让 PC 指向第一条指令即可。
 
 因此，tail call 链上的程序要么都 JIT 编译执行，要么都解释执行，不能交替。调用链可以动态调整，修改 PROG_ARRAY 即可，在包处理 pipeline 这类场景中很有用。
@@ -264,7 +264,7 @@ bpf2bpf call 有栈溢出的危险。Verifier 在 [check_max_stack_depth()](http
 4. setsockopt() 附加该程序到 lo 网卡；
 5. [bpf_map_lookup_elem()](https://elixir.bootlin.com/linux/v5.13/source/tools/lib/bpf/bpf.c#L424) 查询 map，得到统计信息。
 
-与指令宏相比，用高级语言编写 eBPF 程序更友好。LLVM 已有完善的 eBPF 后端，可以从 C 生成 [ELF 格式](/todo) 的目标文件，其中包含 eBPF 程序和 map 信息等。libbpf 能解析该目标文件，完成所需 map 的创建以及 eBPF 程序的加载。
+与指令宏相比，用高级语言编写 eBPF 程序更友好。LLVM 已有完善的 eBPF 后端，可以从 C 生成 [ELF 格式](../todo) 的目标文件，其中包含 eBPF 程序和 map 信息等。libbpf 能解析该目标文件，完成所需 map 的创建以及 eBPF 程序的加载。
 
 ### Verifier
 eBPF 程序运行在内核态，加载到内核时调用 [bpf_check()](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/verifier.c#L13358)，即 Verifier 验证其安全性：

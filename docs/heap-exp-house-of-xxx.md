@@ -1,5 +1,5 @@
 # 堆利用：House Of 系列
-参见 [ctf-wiki](https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/introduction/)、[how2heap](https://github.com/shellphish/how2heap)。以 [ptmalloc2](/ptmalloc2) 为例。
+参见 [ctf-wiki](https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/introduction/)、[how2heap](https://github.com/shellphish/how2heap)。以 [ptmalloc2](../ptmalloc2) 为例。
 
 分配和释放以 chunk 为单位。malloc() 时会先补上 chunk header 的开销：加上一个字然后向上对齐双字。换言之，malloc(0x10) 和 malloc(0x18) 在分配器看来一样，都是分配至少 0x20 大小的 chunk。相应地，free() 的地址也会先转成对应 chunk 的起始地址。为了说明方便，先引入两个记号：
 
@@ -108,7 +108,7 @@ chunk1 伪造 fd 是为了第 6 步取 chunk 0 时绕过 small bin 的完整性�
 
 利用：修改 top->size，然后触发 sysmalloc() 扩展 top chunk。此时旧堆顶，即 sbrk() 的返回值，将不等于 top+top->size，按发生外部 sbrk()，无法连续扩展 top chunk 处理：在旧堆顶附近构造新 top chunk，并将旧 top chunk 通过 _int_free() 释放。
 
-House of Orange 的用途是在没有 free() 时，通过 malloc() 释放一个 chunk 到 tcache/fastbin/bin，以便后续利用。该原语来自 Hitcon'16 的 [house-of-orange](https://github.com/ctfs/write-ups-2016/tree/master/hitcon-ctf-2016/pwn/house-of-orange-500)，预期解为释放 chunk 到 unsorted bin，再 unsorted bin attack 劫持 _IO_list_all，然后通过 malloc_printerr() 触发 [FSOP](/todo) 完成利用。
+House of Orange 的用途是在没有 free() 时，通过 malloc() 释放一个 chunk 到 tcache/fastbin/bin，以便后续利用。该原语来自 Hitcon'16 的 [house-of-orange](https://github.com/ctfs/write-ups-2016/tree/master/hitcon-ctf-2016/pwn/house-of-orange-500)，预期解为释放 chunk 到 unsorted bin，再 unsorted bin attack 劫持 _IO_list_all，然后通过 malloc_printerr() 触发 [FSOP](../todo) 完成利用。
 
 ## House of Spirit (latest)
 条件：地址 addr 可控（，某较高地址 nextaddr 的值满足约束）。

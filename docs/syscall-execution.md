@@ -53,13 +53,13 @@ __libc_open64 (const char *file, int oflag, ...)
     (long int) resultvar;						\
 })
 ```
-先根据 [调用约定](/todo) 传参到相应寄存器，然后通过 [内联汇编](/todo) 执行 syscall 指令。
+先根据 [调用约定](../todo) 传参到相应寄存器，然后通过 [内联汇编](../todo) 执行 syscall 指令。
 
 ## [syscall 指令](https://www.felixcloutier.com/x86/syscall)：ring3 到 ring0
-用户态和内核态的切换，本质是 CPU 特权级的改变。syscall 指令会将 CPL 设置为 0，即切换到内核态。该指令还将根据 [MSR 寄存器](/register#msr) 更新 RIP，设置 CS 和 SS 这两个 [段寄存器](/register#_1)。具体操作如下：
+用户态和内核态的切换，本质是 CPU 特权级的改变。syscall 指令会将 CPL 设置为 0，即切换到内核态。该指令还将根据 [MSR 寄存器](../register#msr) 更新 RIP，设置 CS 和 SS 这两个 [段寄存器](../register#_1)。具体操作如下：
 
 1. 保存返回地址（即 syscall 下一条指令的地址，和 call 类似）到 RCX，保存 RFLAGS 到 R11；
-2. 设置 RIP 为 IA32_LSTAR MSR 的值（wrmsr 指令保证这一定是个 [合规地址](/canonical-address)）；
+2. 设置 RIP 为 IA32_LSTAR MSR 的值（wrmsr 指令保证这一定是个 [合规地址](../canonical-address)）；
 3. 根据 IA32_FMASK MSR 清空 RFLAGS 的相应位；
 4. 设置代码段寄存器 CS：
     - Selector = IA32_STAR[47:32] & FFFCH，与操作是为了设置 RPL 为 0；
@@ -144,7 +144,7 @@ __visible noinstr void do_syscall_64(unsigned long nr, struct pt_regs *regs)
     //...
 }
 ```
-每次系统调用执行前都会 [add_random_kstack_offset()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/randomize_kstack.h#L35) 引入随机性，参见 [KASLR](/todo)。[array_index_nospec()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/nospec.h#L51) 宏将非法 nr 修改为 0。因为即使有 if 判断，CPU 错误的分支预测仍可能导致非法 nr 被执行。执行系统调用根据系统调用号查表即可。
+每次系统调用执行前都会 [add_random_kstack_offset()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/randomize_kstack.h#L35) 引入随机性，参见 [KASLR](../todo)。[array_index_nospec()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/nospec.h#L51) 宏将非法 nr 修改为 0。因为即使有 if 判断，CPU 错误的分支预测仍可能导致非法 nr 被执行。执行系统调用根据系统调用号查表即可。
 
 ### 执行 sysret 指令
 在返回前，先从栈上的 pt_regs 恢复部分寄存器进行检查：

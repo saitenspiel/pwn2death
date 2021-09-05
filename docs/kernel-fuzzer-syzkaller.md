@@ -1,14 +1,14 @@
 # 使用 Syzkaller
 ## 安装 QEMU
-参考 [gdb 调试内核：安装 QEMU](/kernel-debugging-qemu-busybox-gdb/#qemu)。
+参考 [gdb 调试内核：安装 QEMU](../kernel-debugging-qemu-busybox-gdb/#qemu)。
 
 ## 准备内核镜像
-拉源码，配置，编译。流程参考 [gdb 调试内核：准备内核镜像](/kernel-debugging-qemu-busybox-gdb/#_1)。Syzkaller 要求至少启用以下配置选项：
+拉源码，配置，编译。流程参考 [gdb 调试内核：准备内核镜像](../kernel-debugging-qemu-busybox-gdb/#_1)。Syzkaller 要求至少启用以下配置选项：
 
 - CONFIG_KCOV：采集覆盖率信息。
 - CONFIG_DEBUG_INFO：带上调试信息。
-- CONFIG_KASAN、CONFIG_KASAN_INLINE：开启 [KASAN](/todo)，检测 OOB、UAF 等漏洞。INLINE 表示使用内联插桩，和外联插桩的区别是：外联插函数调用，占用空间小，但是慢；内联则展开函数直接插代码，省去了过程调用的开销，效率更高，代价是生成的镜像会大很多。
-- CONFIG_CONFIGFS_FS、CONFIG_SECURITYFS：Syzkaller 使用 Debian 镜像作为 [根文件系统](/root-filesystem)，为此需要启用 [configfs](https://www.kernel.org/doc/html/latest/filesystems/configfs.html) 和 [securityfs](https://www.linux.org/threads/pipefs-sockfs-debugfs-and-securityfs.9638/)。
+- CONFIG_KASAN、CONFIG_KASAN_INLINE：开启 [KASAN](../todo)，检测 OOB、UAF 等漏洞。INLINE 表示使用内联插桩，和外联插桩的区别是：外联插函数调用，占用空间小，但是慢；内联则展开函数直接插代码，省去了过程调用的开销，效率更高，代价是生成的镜像会大很多。
+- CONFIG_CONFIGFS_FS、CONFIG_SECURITYFS：Syzkaller 使用 Debian 镜像作为 [根文件系统](../root-filesystem)，为此需要启用 [configfs](https://www.kernel.org/doc/html/latest/filesystems/configfs.html) 和 [securityfs](https://www.linux.org/threads/pipefs-sockfs-debugfs-and-securityfs.9638/)。
 
 其他选项可参考 [kernel_configs.md](https://github.com/google/syzkaller/blob/master/docs/linux/kernel_configs.md) 配置，也可以直接用 Syzkaller 提供的 [.config](https://github.com/google/syzkaller/blob/master/dashboard/config/linux/upstream-apparmor-kasan.config) 文件。
 

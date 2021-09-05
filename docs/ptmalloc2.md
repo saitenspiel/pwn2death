@@ -1,6 +1,6 @@
 # ptmalloc2
 ## 概述
-[ptmalloc](http://www.malloc.de/en/)（pthreads malloc）是 C 风格内存管理 malloc()/free() 的一个实现，在其前身 dlmalloc（Doug Lea malloc）的基础上添加了多线程支持。ptmalloc2 是它的第二个版本，发布后很快集成到 glibc 中，之后的版本迭代也直接在 glibc 中进行。版本迭代一是会增加新的完整性检查，有些利用原语会随之失效；二是会引入新机制，这可能带来新的利用点。因此 [glibc 下的堆利用](/heap-exp-house-of-xxx) 与版本关系密切。
+[ptmalloc](http://www.malloc.de/en/)（pthreads malloc）是 C 风格内存管理 malloc()/free() 的一个实现，在其前身 dlmalloc（Doug Lea malloc）的基础上添加了多线程支持。ptmalloc2 是它的第二个版本，发布后很快集成到 glibc 中，之后的版本迭代也直接在 glibc 中进行。版本迭代一是会增加新的完整性检查，有些利用原语会随之失效；二是会引入新机制，这可能带来新的利用点。因此 [glibc 下的堆利用](../heap-exp-house-of-xxx) 与版本关系密切。
 
 ### 主要思路
 - 小内存在堆区分配，大内存在 mmap 区分配；
