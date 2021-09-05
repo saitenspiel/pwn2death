@@ -1,0 +1,23 @@
+site_name: pwn2death
+nav:
+  - '': 'index.md'
+  - 'bpf.md'
+  - 'kernel-debugging-qemu-busybox-gdb.md'
+  - 'kernel-fuzzer-syzkaller.md'
+  - 'syscall-execution.md'
+  - 'root-filesystem.md'
+  - 'kernel-security-principle.md'
+  - 'ptmalloc2.md'
+  - 'heap-exp-house-of-xxx.md'
+theme:
+  name: 'material'
+plugins:
+  []
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js
+  - javascripts/config.js
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/github.min.css
+  - css/list-marker.css
+extra:
+  generator: false
