@@ -1,0 +1,7 @@
+article ol ol {
+        list-style-type: lower-roman !important;
+}
+
+article ol ol ol {
+        list-style-type: lower-alpha !important;
+}

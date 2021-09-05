@@ -1,0 +1,445 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+    
+    
+      
+        <title>Register - pwn2death</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/github.min.css">
+    
+      <link rel="stylesheet" href="../css/list-marker.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pwn2death" class="md-header__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pwn2death
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Register
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pwn2death" class="md-nav__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    pwn2death
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bpf/" class="md-nav__link">
+        从 BPF 到 eBPF
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-nav__link">
+        gdb 调试内核
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-fuzzer-syzkaller/" class="md-nav__link">
+        使用 Syzkaller
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../syscall-execution/" class="md-nav__link">
+        执行系统调用
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-filesystem/" class="md-nav__link">
+        根文件系统
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-security-principle/" class="md-nav__link">
+        内核安全机制设计思路
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ptmalloc2/" class="md-nav__link">
+        ptmalloc2
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heap-exp-house-of-xxx/" class="md-nav__link">
+        堆利用：House Of 系列
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    段寄存器
+  </a>
+  
+    <nav class="md-nav" aria-label="段寄存器">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cs" class="md-nav__link">
+    CS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsss-es" class="md-nav__link">
+    DS、SS 和 ES
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fs-gs" class="md-nav__link">
+    FS 和 GS
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#msr" class="md-nav__link">
+    MSR 寄存器
+  </a>
+  
+    <nav class="md-nav" aria-label="MSR 寄存器">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ia32_fs_base" class="md-nav__link">
+    IA32_FS_BASE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ia32_gs_base" class="md-nav__link">
+    IA32_GS_BASE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ia32_kernel_gs_base" class="md-nav__link">
+    IA32_KERNEL_GS_BASE
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                  <h1>Register</h1>
+                
+                <h3 id="_1">段寄存器</h3>
+<p>在 <a href="/todo">分段</a> 机制中，一个段寄存器就是一个内存区域的描述。但是长模式下，分段机制被进一步弱化。通过非空 selector 进行内存访问时，基址和界限字段将被忽略，不检查越界，只检查地址是否合规。</p>
+<h4 id="cs">CS</h4>
+<p>长模式下，代码段寄存器 CS 的基址和界限字段将被忽略，但是属性字段仍然保留。</p>
+<h4 id="dsss-es">DS、SS 和 ES</h4>
+<p>数据段寄存器 DS、堆栈段寄存器 SS 和附加数据段寄存器 ES 不再使用，基址、界限和属性字段都会被忽略。</p>
+<h4 id="fs-gs">FS 和 GS</h4>
+<p>长模式下，FS 和 GS 是唯二能体现分段思想的段寄存器，它们的基址是有意义的。</p>
+<p>这两个段的具体作用由 OS 决定。GDT 中没有它们的 descriptor，它们的 selector 可以设成 null。它们的基址通过特定的 MSR 寄存器设置。具体来说，FS 的基址由 <a href="#ia32_fs_base">IA32_FS_BASE</a> 指定，GS 的基址由 <a href="#ia32_gs_base">IA32_GS_BASE</a> 或 <a href="#ia32_kernel_gs_base">IA32_KERNEL_GS_BASE</a> 指定。</p>
+<p>一般来说，FS 用作 TLS。GS 用来放 per-cpu 数据，<a href="/todo">Canary</a> 从这里取。</p>
+<h3 id="msr">MSR 寄存器</h3>
+<h4 id="ia32_fs_base">IA32_FS_BASE</h4>
+<p>存放 FS 基址。</p>
+<h4 id="ia32_gs_base">IA32_GS_BASE</h4>
+<p>用户 GS 基址 GSBase。该寄存器实际上维护了一个在用户空间和内核空间来回切换的指针。在 ring3 下，该指针指向用户 GS，用不到的话就设为 0；在 ring0 下，该指针指向内核 GS，用于存放 per-cpu 数据。切换通过 swapgs 指令进行，该指令会交换 IA32_GS_BASE 和 IA32_KERNEL_GS_BASE 两个寄存器的值。</p>
+<h4 id="ia32_kernel_gs_base">IA32_KERNEL_GS_BASE</h4>
+<p>内核 per-cpu 数据区域基址 KernelGSBase。该寄存器配合 swapgs 指令使用。进入 ring0 时，执行一次 swapgs，将 IA32_GS_BASE 设为 KernelGSBase，同时保存了其旧值 GSBase。返回 ring3 时，再执行一次 swapgs，还原。</p>
+<p>如果内核代码要使用 per-cpu 数据，必须保证从进入 ring0 起，swapgs 的执行次数为奇数。否则，GS 段基址就不是 KernelGSBase，而是 GSBase。</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+      
+        <script src="../javascripts/config.js"></script>
+      
+    
+  </body>
+</html>

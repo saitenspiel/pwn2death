@@ -1,0 +1,730 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+    
+    
+      
+        <title>执行系统调用 - pwn2death</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/github.min.css">
+    
+      <link rel="stylesheet" href="../css/list-marker.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pwn2death" class="md-header__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pwn2death
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              执行系统调用
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pwn2death" class="md-nav__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    pwn2death
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bpf/" class="md-nav__link">
+        从 BPF 到 eBPF
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-nav__link">
+        gdb 调试内核
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-fuzzer-syzkaller/" class="md-nav__link">
+        使用 Syzkaller
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          执行系统调用
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        执行系统调用
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#libc-syscall" class="md-nav__link">
+    从 libc 到 syscall 指令
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syscall-ring3-ring0" class="md-nav__link">
+    syscall 指令：ring3 到 ring0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entry_syscall_64" class="md-nav__link">
+    entry_SYSCALL_64
+  </a>
+  
+    <nav class="md-nav" aria-label="entry_SYSCALL_64">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    准备工作
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    执行系统调用
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sysret" class="md-nav__link">
+    执行 sysret 指令
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sysret-ring0-ring3" class="md-nav__link">
+    sysret 指令：ring0 回到 ring3
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-filesystem/" class="md-nav__link">
+        根文件系统
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-security-principle/" class="md-nav__link">
+        内核安全机制设计思路
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ptmalloc2/" class="md-nav__link">
+        ptmalloc2
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heap-exp-house-of-xxx/" class="md-nav__link">
+        堆利用：House Of 系列
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#libc-syscall" class="md-nav__link">
+    从 libc 到 syscall 指令
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syscall-ring3-ring0" class="md-nav__link">
+    syscall 指令：ring3 到 ring0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entry_syscall_64" class="md-nav__link">
+    entry_SYSCALL_64
+  </a>
+  
+    <nav class="md-nav" aria-label="entry_SYSCALL_64">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    准备工作
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    执行系统调用
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sysret" class="md-nav__link">
+    执行 sysret 指令
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sysret-ring0-ring3" class="md-nav__link">
+    sysret 指令：ring0 回到 ring3
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="_1">执行系统调用</h1>
+<p>系统调用从用户态发起，在内核态执行，完成后又返回用户态。其执行可以分为四个阶段：</p>
+<ol>
+<li>在用户空间调用 libc 接口，libc 将其转换成 syscall 指令；</li>
+<li>syscall 指令从用户态切换到内核态，转交控制权到内核；</li>
+<li>内核执行系统调用，完成后执行 sysret 指令；</li>
+<li>sysret 指令从内核态切换回用户态，转交控制权到用户空间。</li>
+</ol>
+<h2 id="libc-syscall">从 libc 到 syscall 指令</h2>
+<p>以 glibc 的 open() 函数为例。在用户空间，包含头文件 fcntl.h 即可使用 open() 函数，这个 open() 不是系统调用，是 glibc 对系统调用的封装。封装入口是 <a href="https://elixir.bootlin.com/glibc/glibc-2.33/source/sysdeps/unix/sysv/linux/open64.c#L36">__libc_open64()</a>：</p>
+<pre><code class="language-c">int
+__libc_open64 (const char *file, int oflag, ...)
+{
+  // ...
+  return SYSCALL_CANCEL (openat, AT_FDCWD, file, oflag | EXTRA_OPEN_FLAGS,
+                         mode);
+}
+</code></pre>
+<p>进入 <a href="https://elixir.bootlin.com/glibc/glibc-2.33/source/sysdeps/unix/sysdep.h#L91">SYSCALL_CANCEL</a> 宏，注意这里实际执行的系统调用不是 open()，而是 openat()。该宏负责处理异步线程取消：如果是单线程，直接执行系统调用；多线程则先启用异步取消模式。不管哪种情况，都进入 <a href="https://elixir.bootlin.com/glibc/glibc-2.33/source/sysdeps/unix/sysdep.h#L88">INLINE_SYSCALL_CALL</a> 宏，该宏解析变长参数，提出参数个数 nr，最终执行到 <a href="https://elixir.bootlin.com/glibc/glibc-2.33/source/sysdeps/unix/sysv/linux/sysdep.h#L42">INLINE_SYSCALL</a> 宏：</p>
+<pre><code class="language-c">#define INLINE_SYSCALL(name, nr, args...)               \
+  ({                                    \
+    long int sc_ret = INTERNAL_SYSCALL (name, nr, args);        \
+    __glibc_unlikely (INTERNAL_SYSCALL_ERROR_P (sc_ret))        \
+    ? SYSCALL_ERROR_LABEL (INTERNAL_SYSCALL_ERRNO (sc_ret))     \
+    : sc_ret;                               \
+  })
+</code></pre>
+<p>进入 <a href="https://elixir.bootlin.com/glibc/glibc-2.33/source/sysdeps/unix/sysv/linux/x86_64/sysdep.h#L234">INTERNAL_SYSCALL</a> 宏，其与体系结构相关，x64 下定义为：</p>
+<pre><code class="language-c">#define INTERNAL_SYSCALL(name, nr, args...)             \
+    internal_syscall##nr (SYS_ify (name), args)
+</code></pre>
+<p>根据参数个数 nr 展开到相应宏，<a href="https://elixir.bootlin.com/glibc/glibc-2.33/source/sysdeps/unix/sysv/linux/x86_64/sysdep.h#L34">SYS_ify</a> 宏会将 name 替换为对应的系统调用号。因为 openat() 是 4 个参数，所以进入 <a href="https://elixir.bootlin.com/glibc/glibc-2.33/source/sysdeps/unix/sysv/linux/x86_64/sysdep.h#L302">internal_syscall4</a> 宏：</p>
+<pre><code class="language-c">#define internal_syscall4(number, arg1, arg2, arg3, arg4)       \
+({                                  \
+    unsigned long int resultvar;                    \
+    TYPEFY (arg4, __arg4) = ARGIFY (arg4);              \
+    TYPEFY (arg3, __arg3) = ARGIFY (arg3);              \
+    TYPEFY (arg2, __arg2) = ARGIFY (arg2);              \
+    TYPEFY (arg1, __arg1) = ARGIFY (arg1);              \
+    register TYPEFY (arg4, _a4) asm (&quot;r10&quot;) = __arg4;           \
+    register TYPEFY (arg3, _a3) asm (&quot;rdx&quot;) = __arg3;           \
+    register TYPEFY (arg2, _a2) asm (&quot;rsi&quot;) = __arg2;           \
+    register TYPEFY (arg1, _a1) asm (&quot;rdi&quot;) = __arg1;           \
+    asm volatile (                          \
+    &quot;syscall\n\t&quot;                           \
+    : &quot;=a&quot; (resultvar)                          \
+    : &quot;0&quot; (number), &quot;r&quot; (_a1), &quot;r&quot; (_a2), &quot;r&quot; (_a3), &quot;r&quot; (_a4)      \
+    : &quot;memory&quot;, REGISTERS_CLOBBERED_BY_SYSCALL);            \
+    (long int) resultvar;                       \
+})
+</code></pre>
+<p>先根据 <a href="/todo">调用约定</a> 传参到相应寄存器，然后通过 <a href="/todo">内联汇编</a> 执行 syscall 指令。</p>
+<h2 id="syscall-ring3-ring0"><a href="https://www.felixcloutier.com/x86/syscall">syscall 指令</a>：ring3 到 ring0</h2>
+<p>用户态和内核态的切换，本质是 CPU 特权级的改变。syscall 指令会将 CPL 设置为 0，即切换到内核态。该指令还将根据 <a href="/register#msr">MSR 寄存器</a> 更新 RIP，设置 CS 和 SS 这两个 <a href="/register#_1">段寄存器</a>。具体操作如下：</p>
+<ol>
+<li>保存返回地址（即 syscall 下一条指令的地址，和 call 类似）到 RCX，保存 RFLAGS 到 R11；</li>
+<li>设置 RIP 为 IA32_LSTAR MSR 的值（wrmsr 指令保证这一定是个 <a href="/canonical-address">合规地址</a>）；</li>
+<li>根据 IA32_FMASK MSR 清空 RFLAGS 的相应位；</li>
+<li>设置代码段寄存器 CS：<ul>
+<li>Selector = IA32_STAR[47:32] &amp; FFFCH，与操作是为了设置 RPL 为 0；</li>
+<li>Base = 0；Limit = FFFFFH，界限字段 20 位，4K 粒度下就是 4G 的段空间；</li>
+<li>Type = 11，代码，可执行、可读，已被访问；</li>
+<li>S = 1，非系统段；DPL = 0；P = 1；L = 1，64 位模式；D = 0；G = 1，4K 粒度；</li>
+</ul>
+</li>
+<li>CPL = 0，进入内核态；</li>
+<li>设置堆栈段寄存器 SS：<ul>
+<li>Selector = IA32_STAR[47:32] + 8，SS 的描述符紧跟着 CS；</li>
+<li>Base = 0；Limit = FFFFFH，界限字段 20 位，4K 粒度下就是 4G 的段空间；</li>
+<li>Type = 3，数据，可读、可写，已被访问；</li>
+<li>S = 1；DPL = 0；P = 1；B = 1；G = 1。</li>
+</ul>
+</li>
+</ol>
+<p>涉及到的 IA32_{LSTAR，FMASK，STAR} 这三个 MSR 寄存器由内核负责初始化。调用栈为 <a href="https://elixir.bootlin.com/linux/v5.13/source/init/main.c#L875">start_kernel()</a> -&gt; <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/kernel/traps.c#L1155">trap_init()</a> -&gt; <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/kernel/cpu/common.c#L1945">cpu_init()</a> -&gt; <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/kernel/cpu/common.c#L1752">syscall_init()</a>：</p>
+<pre><code class="language-c">void syscall_init(void)
+{
+    // IA32_STAR, for CS/SS.Selector
+    wrmsr(MSR_STAR, 0, (__USER32_CS &lt;&lt; 16) | __KERNEL_CS);
+    // IA32_LSTAR, for RIP
+    wrmsrl(MSR_LSTAR, (unsigned long)entry_SYSCALL_64);
+    // ...
+    // IA32_FMASK, for RFLAGS clearing
+    wrmsrl(MSR_SYSCALL_MASK,
+           X86_EFLAGS_TF|X86_EFLAGS_DF|X86_EFLAGS_IF|
+           X86_EFLAGS_IOPL|X86_EFLAGS_AC|X86_EFLAGS_NT);
+}
+</code></pre>
+<p>IA32_STAR 的低 32 位被设置为 0，高 32 位被设置为 __USER32_CS 和 __KERNEL_CS 的串联。前者用于 sysret 时 CS/SS 的设置，后者用于 syscall 时 CS/SS 的设置。</p>
+<p>IA32_LSTAR 被设置为一段汇编指令 entry_SYSCALL_64 的地址，这就是系统调用的内核入口点。当 syscall 指令执行完成后，控制权将转移到这段汇编指令。</p>
+<p>IA32_FMASK 设置了 X86_EFLAGS_IF 位，意味着 syscall 指令会清除 RFLAGS 的 IF 位，可屏蔽中断将被屏蔽。禁止中断重入的一个原因是 swapgs 指令不支持。</p>
+<p>注意 syscall 指令既不更新也不保存 RSP，这一任务将由内核完成。</p>
+<h2 id="entry_syscall_64"><a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/entry_64.S#L87">entry_SYSCALL_64</a></h2>
+<p>作为系统调用的内核入口，entry_SYSCALL_64 会先进行一些准备工作，然后执行系统调用，最后使用 sysret 指令返回到用户态。</p>
+<h3 id="_2">准备工作</h3>
+<ol>
+<li>执行 swapgs 指令，交换 IA32_GS_BASE 和 IA32_KERNEL_GS_BASE 这两个 MSR 寄存器的值，让 GS 段指向内核 per-cpu 数据区域；</li>
+<li>保存 RSP，通过 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/calling.h#L199">SWITCH_TO_KERNEL_CR3</a> 宏切换 CR3，让 RSP 指向内核栈：</li>
+</ol>
+<pre><code class="language-c">    // save RSP to scratch space
+    movq    %rsp, PER_CPU_VAR(cpu_tss_rw + TSS_sp2)
+    // switch CR3 to kernel page-dir base
+    SWITCH_TO_KERNEL_CR3 scratch_reg=%rsp
+    // point RSP to kernel stack
+    movq    PER_CPU_VAR(cpu_current_top_of_stack), %rsp
+</code></pre>
+<p><a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/asm/percpu.h#L14">PER_CPU_VAR(var)</a> 宏用于访问由内核管理的 per-cpu 数据，在 64 位多处理器下展开为 %gs:var。因此，使用该宏时必须保证 IA32_GS_BASE 指向内核 GS，即 swapgs 指令恰执行了奇数次。</p>
+<ol>
+<li>在栈上填充 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/asm/ptrace.h#L59">pt_regs</a>：</li>
+</ol>
+<pre><code class="language-x86asm">    pushq   $__USER_DS                          ; pt_regs-&gt;ss
+    pushq   PER_CPU_VAR(cpu_tss_rw + TSS_sp2)   ; pt_regs-&gt;sp
+    pushq   %r11                                ; pt_regs-&gt;flags
+    pushq   $__USER_CS                          ; pt_regs-&gt;cs
+    pushq   %rcx                                ; pt_regs-&gt;ip
+    ; ...
+    pushq   %rax                                ; pt_regs-&gt;orig_ax
+
+    PUSH_AND_CLEAR_REGS rax=$-ENOSYS
+</code></pre>
+<p>这里 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/calling.h#L100">PUSH_AND_CLEAR_REGS</a> 宏会依次入栈 RDI、RSI、RDX、RCX、RAX（实际入栈的是 $-ENOSYS，作为系统调用号非法时的返回值）、R8、R9、R10、R11、RBX、RBP、R12、R13、R14、R15。此时各寄存器的值已按 pt_regs 定义的顺序保存在栈上，之后通过 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/calling.h#L70">寄存器同名宏</a> 可以方便地将其还原到寄存器中</p>
+<h3 id="_3">执行系统调用</h3>
+<pre><code class="language-x86asm">    movq    %rax, %rdi      ; %rdi = syscall number (1st arg)
+    movq    %rsp, %rsi      ; %rsi = &amp;pt_regs (2nd arg)
+    call    do_syscall_64
+</code></pre>
+<p>系统调用的执行函数为 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/common.c#L39">do_syscall_64()</a>：</p>
+<pre><code class="language-c">__visible noinstr void do_syscall_64(unsigned long nr, struct pt_regs *regs)
+{
+    add_random_kstack_offset(); // so the (kernel) stack base varies between syscalls
+    //...
+    if (likely(nr &lt; NR_syscalls)) {
+        nr = array_index_nospec(nr, NR_syscalls); // clamp 'nr' within [0, NR_syscalls)
+        regs-&gt;ax = sys_call_table[nr](regs); // the return value will overwrite -ENOSYS
+    //...
+}
+</code></pre>
+<p>每次系统调用执行前都会 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/randomize_kstack.h#L35">add_random_kstack_offset()</a> 引入随机性，参见 <a href="/todo">KASLR</a>。<a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/nospec.h#L51">array_index_nospec()</a> 宏将非法 nr 修改为 0。因为即使有 if 判断，CPU 错误的分支预测仍可能导致非法 nr 被执行。执行系统调用根据系统调用号查表即可。</p>
+<h3 id="sysret">执行 sysret 指令</h3>
+<p>在返回前，先从栈上的 pt_regs 恢复部分寄存器进行检查：</p>
+<ul>
+<li>pt_regs.RCX == pt_regs.RIP 且其值为合规地址，其中 pt_regs.RIP 临时恢复到 R11；</li>
+<li>$__USER_CS == pt_regs.CS，仅检查栈上内容，不恢复到 CS；</li>
+<li>pt_regs.R11 == pt_regs.RFLAGS；</li>
+<li>(RF | TF) &amp; pt_regs.R11 == 0，RFLAGS 的 RF 和 TF 位必须为 0；</li>
+<li>RSP 无须检查；</li>
+<li>$__USER_DS == pt_regs.SS，仅检查栈上内容，不恢复到 SS。</li>
+</ul>
+<p>如果检查未通过，将改用 iret 指令返回。如果通过，则调用 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/calling.h#L149">POP_REGS</a> 宏恢复剩余寄存器，这里跳过了马上要使用的 RDI：</p>
+<pre><code class="language-c">    POP_REGS pop_rdi=0 skip_r11rcx=1    // RCX and R11 are already restored 
+</code></pre>
+<p>现在 RSP 指向 pt_regs.RDI 的位置。切换到 trampoline 栈，进行可能需要的善后工作：</p>
+<pre><code class="language-c">    // now all regs are restored except RSP and RDI
+    movq    %rsp, %rdi                                  // save the old stack pointer to RDI
+    movq    PER_CPU_VAR(cpu_tss_rw + TSS_sp0), %rsp     // go to the trampoline stack
+
+    // now RDI points to the old stack
+    pushq   RSP-RDI(%rdi)   // save pt_regs.RSP there
+    pushq   (%rdi)          // save pt_regs.RDI there
+
+    // now we are on the trampoline stack, all regs except RDI are live
+
+    // in the future, other exit work can be done here
+    // for now, only gcc may do something, see CONFIG_GCC_PLUGIN_STACKLEAK
+    STACKLEAK_ERASE_NOCLOBBER   
+</code></pre>
+<p>通过 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/calling.h#L244">SWITCH_TO_USER_CR3_STACK</a> 宏切换 CR3，将刚刚入栈的 pt_regs.RDI 和 pt_regs.RSP 恢复到对应寄存器，让 GS 段指回用户空间，执行 sysret 指令：</p>
+<pre><code class="language-c">    SWITCH_TO_USER_CR3_STACK scratch_reg=%rdi
+
+    popq    %rdi
+    popq    %rsp
+    swapgs
+    sysretq
+</code></pre>
+<h2 id="sysret-ring0-ring3"><a href="https://www.felixcloutier.com/x86/sysret">sysret 指令</a>：ring0 回到 ring3</h2>
+<p>sysret 指令将恢复之前 syscall 指令修改的内容，包括 CPL、RIP/RFLAGS 和 CS/SS，具体操作如下：</p>
+<ol>
+<li>如果 CPL 不为 0 或 RCX 的值不是合规地址，抛 #GP(0) 异常；</li>
+<li>设置 RIP 为保存在 RCX 中的返回地址；</li>
+<li>从 R11 中 恢复 RFLAGS；</li>
+<li>设置代码段寄存器 CS：<ul>
+<li>Selector = (IA32_STAR[63:48] + 16) | 3，或操作是设置 RPL 为 3；</li>
+<li>Base = 0；Limit = FFFFFH；Type = 11；DPL = 3；...</li>
+</ul>
+</li>
+<li>CPL = 3，返回用户态；</li>
+<li>设置堆栈段寄存器 SS：<ul>
+<li>Selector = (IA32_STAR[63:48] + 8) | 3，或操作是设置 RPL 为 3；</li>
+<li>Base = 0；Limit = FFFFFH；Type = 3；DPL = 3；...</li>
+</ul>
+</li>
+</ol>
+<p>现在 RIP 指向之前 syscall 指令的下一条指令，控制流将继续向前。</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../kernel-fuzzer-syzkaller/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 使用 Syzkaller" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              使用 Syzkaller
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../root-filesystem/" class="md-footer__link md-footer__link--next" aria-label="Next: 根文件系统" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              根文件系统
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+      
+        <script src="../javascripts/config.js"></script>
+      
+    
+  </body>
+</html>

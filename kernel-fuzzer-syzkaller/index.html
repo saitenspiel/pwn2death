@@ -1,0 +1,775 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+    
+    
+      
+        <title>使用 Syzkaller - pwn2death</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/github.min.css">
+    
+      <link rel="stylesheet" href="../css/list-marker.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#syzkaller" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pwn2death" class="md-header__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pwn2death
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              使用 Syzkaller
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pwn2death" class="md-nav__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    pwn2death
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bpf/" class="md-nav__link">
+        从 BPF 到 eBPF
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-nav__link">
+        gdb 调试内核
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          使用 Syzkaller
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        使用 Syzkaller
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qemu" class="md-nav__link">
+    安装 QEMU
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    准备内核镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备内核镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    Quick Start
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debian" class="md-nav__link">
+    准备 Debian 镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备 Debian 镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-debootstrap" class="md-nav__link">
+    1. 安装 debootstrap
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2. 创建镜像
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3. 测试
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syzkaller_1" class="md-nav__link">
+    安装 Syzkaller
+  </a>
+  
+    <nav class="md-nav" aria-label="安装 Syzkaller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0-golang" class="md-nav__link">
+    0. 安装 Golang
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-syzkaller" class="md-nav__link">
+    1. 下载 Syzkaller 源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    2. 编译
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzing" class="md-nav__link">
+    开始 fuzzing
+  </a>
+  
+    <nav class="md-nav" aria-label="开始 fuzzing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1. 配置
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    2. 运行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../syscall-execution/" class="md-nav__link">
+        执行系统调用
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-filesystem/" class="md-nav__link">
+        根文件系统
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-security-principle/" class="md-nav__link">
+        内核安全机制设计思路
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ptmalloc2/" class="md-nav__link">
+        ptmalloc2
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heap-exp-house-of-xxx/" class="md-nav__link">
+        堆利用：House Of 系列
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qemu" class="md-nav__link">
+    安装 QEMU
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    准备内核镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备内核镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    Quick Start
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debian" class="md-nav__link">
+    准备 Debian 镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备 Debian 镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-debootstrap" class="md-nav__link">
+    1. 安装 debootstrap
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2. 创建镜像
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3. 测试
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#syzkaller_1" class="md-nav__link">
+    安装 Syzkaller
+  </a>
+  
+    <nav class="md-nav" aria-label="安装 Syzkaller">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0-golang" class="md-nav__link">
+    0. 安装 Golang
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-syzkaller" class="md-nav__link">
+    1. 下载 Syzkaller 源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    2. 编译
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fuzzing" class="md-nav__link">
+    开始 fuzzing
+  </a>
+  
+    <nav class="md-nav" aria-label="开始 fuzzing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1. 配置
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    2. 运行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="syzkaller">使用 Syzkaller</h1>
+<h2 id="qemu">安装 QEMU</h2>
+<p>参考 <a href="/kernel-debugging-qemu-busybox-gdb/#qemu">gdb 调试内核：安装 QEMU</a>。</p>
+<h2 id="_1">准备内核镜像</h2>
+<p>拉源码，配置，编译。流程参考 <a href="/kernel-debugging-qemu-busybox-gdb/#_1">gdb 调试内核：准备内核镜像</a>。Syzkaller 要求至少启用以下配置选项：</p>
+<ul>
+<li>CONFIG_KCOV：采集覆盖率信息。</li>
+<li>CONFIG_DEBUG_INFO：带上调试信息。</li>
+<li>CONFIG_KASAN、CONFIG_KASAN_INLINE：开启 <a href="/todo">KASAN</a>，检测 OOB、UAF 等漏洞。INLINE 表示使用内联插桩，和外联插桩的区别是：外联插函数调用，占用空间小，但是慢；内联则展开函数直接插代码，省去了过程调用的开销，效率更高，代价是生成的镜像会大很多。</li>
+<li>CONFIG_CONFIGFS_FS、CONFIG_SECURITYFS：Syzkaller 使用 Debian 镜像作为 <a href="/root-filesystem">根文件系统</a>，为此需要启用 <a href="https://www.kernel.org/doc/html/latest/filesystems/configfs.html">configfs</a> 和 <a href="https://www.linux.org/threads/pipefs-sockfs-debugfs-and-securityfs.9638/">securityfs</a>。</li>
+</ul>
+<p>其他选项可参考 <a href="https://github.com/google/syzkaller/blob/master/docs/linux/kernel_configs.md">kernel_configs.md</a> 配置，也可以直接用 Syzkaller 提供的 <a href="https://github.com/google/syzkaller/blob/master/dashboard/config/linux/upstream-apparmor-kasan.config">.config</a> 文件。</p>
+<h3 id="quick-start">Quick Start</h3>
+<pre><code class="language-bash">cd kernel/linux-5.12.13
+wget https://raw.githubusercontent.com/google/syzkaller/master/dashboard/config/linux/upstream-apparmor-kasan.config -O .config
+make oldconfig
+[Enter]...
+make -j8
+</code></pre>
+<p>该配置文件开启了 CONFIG_DEBUG_INFO_BTF 选项，即带上 BPF 的调试信息。该选项要求的 <a href="https://git.kernel.org/pub/scm/devel/pahole/pahole.git">pahole</a> 版本较高，建议关掉。否则内核编译时会报 pahole 版本太旧，并尝试自己关掉，有可能导致编译失败。目前官方是强制关掉该选项，参见 <a href="https://github.com/google/syzkaller/blob/master/syz-ci/jobs.go">jobs.go</a> 和 <a href="https://github.com/google/syzkaller/issues/2096">issue #2096</a>。</p>
+<p>这个选项是用来 fuzz BPF 模块的，要开的话，建议安装最低可用版本：</p>
+<pre><code class="language-bash">sudo apt install libdw-dev
+git clone https://git.kernel.org/pub/scm/devel/pahole/pahole.git
+cd pahole
+git checkout v1.16
+mkdir build &amp;&amp; cd build
+cmake -D__LIB=lib ..
+sudo make install
+</code></pre>
+<p>最新版本的 pahole（v1.21）在链接 .btf.vmlinux.bin.o 时会无限吃内存然后被 OOM killer 干掉。</p>
+<h2 id="debian">准备 Debian 镜像</h2>
+<h3 id="1-debootstrap">1. 安装 debootstrap</h3>
+<pre><code class="language-bash">sudo apt install debootstrap
+</code></pre>
+<h3 id="2">2. 创建镜像</h3>
+<pre><code class="language-bash">mkdir stretch
+cd stretch
+wget https://raw.githubusercontent.com/google/syzkaller/master/tools/create-image.sh -O create-image.sh
+chmod +x create-image.sh
+sudo ./create-image.sh
+</code></pre>
+<p>得到根文件系统镜像 stretch.img，挂载需要的驱动已经包含在其中，不用另外准备 rootfs 镜像。相应的，启动 QEMU 时也无需指定 initrd 参数。</p>
+<h3 id="3">3. 测试</h3>
+<p>启动 QEMU，系统起来后用 root 用户登录，无密码。QEMU 启动脚本如下：</p>
+<pre><code class="language-txt">qemu-system-x86_64 \
+    -m 2G \
+    -smp 2 \
+    -kernel kernel/linux-5.12.13/arch/x86/boot/bzImage \
+    -append &quot;console=ttyS0 root=/dev/sda earlyprintk=serial net.ifnames=0&quot; \
+    -drive file=stretch/stretch.img,format=raw \
+    -net user,host=10.0.2.10,hostfwd=tcp:127.0.0.1:10021-:22 \
+    -net nic,model=e1000 \
+    -enable-kvm \
+    -nographic \
+    -pidfile vm.pid \
+    2&gt;&amp;1 | tee vm.log
+</code></pre>
+<p>然后新开一个终端，ssh 连接到 QEMU：</p>
+<pre><code class="language-bash">sudo ssh -i stretch/stretch.id_rsa -p 10021 -o &quot;StrictHostKeyChecking no&quot; root@localhost
+</code></pre>
+<h2 id="syzkaller_1">安装 Syzkaller</h2>
+<h3 id="0-golang">0. 安装 <a href="https://golang.google.cn/">Golang</a></h3>
+<p>Go 是 Syzkaller 的主力语言，Ubuntu 下可以通过 snap 直接安装，或者：</p>
+<pre><code class="language-bash">wget https://golang.google.cn/dl/go1.16.5.linux-amd64.tar.gz
+tar xf go1.16.5.linux-amd64.tar.gz
+</code></pre>
+<p>配置 \$PATH，该方式只对当前终端有效：</p>
+<pre><code class="language-bash">export PATH=$PATH:`pwd`/go/bin
+</code></pre>
+<h3 id="1-syzkaller">1. 下载 <a href="https://github.com/google/syzkaller.git">Syzkaller 源码</a></h3>
+<p>在配置了 \$PATH 的终端执行：</p>
+<pre><code class="language-bash">git clone https://github.com/google/syzkaller.git
+cd syzkaller
+</code></pre>
+<h3 id="2_1">2. 编译</h3>
+<pre><code class="language-bash">make -j8
+</code></pre>
+<h2 id="fuzzing">开始 fuzzing</h2>
+<h3 id="1">1. 配置</h3>
+<pre><code class="language-bash">cd syzkaller
+mkdir workdir
+vim my.cfg
+</code></pre>
+<pre><code class="language-txt">{
+    &quot;target&quot;: &quot;linux/amd64&quot;,
+    &quot;http&quot;: &quot;127.0.0.1:56741&quot;,
+    &quot;workdir&quot;: &quot;./workdir&quot;,
+    &quot;kernel_obj&quot;: &quot;../kernel/linux-5.12.13&quot;,
+    &quot;image&quot;: &quot;../stretch/stretch.img&quot;,
+    &quot;sshkey&quot;: &quot;../stretch/stretch.id_rsa&quot;,
+    &quot;syzkaller&quot;: &quot;.&quot;,
+    &quot;procs&quot;: 4,
+    &quot;type&quot;: &quot;qemu&quot;,
+    &quot;vm&quot;: {
+        &quot;count&quot;: 4,
+        &quot;kernel&quot;: &quot;../kernel/linux-5.12.13/arch/x86/boot/bzImage&quot;,
+        &quot;cpu&quot;: 2,
+        &quot;mem&quot;: 2048
+    }
+}
+</code></pre>
+<h3 id="2_2">2. 运行</h3>
+<pre><code class="language-bash">sudo ./bin/syz-manager -config=my.cfg
+</code></pre>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-footer__link md-footer__link--prev" aria-label="Previous: gdb 调试内核" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              gdb 调试内核
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../syscall-execution/" class="md-footer__link md-footer__link--next" aria-label="Next: 执行系统调用" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              执行系统调用
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+      
+        <script src="../javascripts/config.js"></script>
+      
+    
+  </body>
+</html>

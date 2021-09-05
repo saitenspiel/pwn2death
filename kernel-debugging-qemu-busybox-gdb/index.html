@@ -1,0 +1,848 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+    
+    
+      
+        <title>gdb 调试内核 - pwn2death</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/github.min.css">
+    
+      <link rel="stylesheet" href="../css/list-marker.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gdb" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pwn2death" class="md-header__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pwn2death
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              gdb 调试内核
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pwn2death" class="md-nav__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    pwn2death
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bpf/" class="md-nav__link">
+        从 BPF 到 eBPF
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          gdb 调试内核
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        gdb 调试内核
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qemu" class="md-nav__link">
+    安装 QEMU
+  </a>
+  
+    <nav class="md-nav" aria-label="安装 QEMU">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0-ninja-re2c" class="md-nav__link">
+    0. 安装 Ninja 及其依赖 re2c
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-qemu" class="md-nav__link">
+    1. 下载 QEMU 源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2. 配置编译目标
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3. 编译、安装
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    准备内核镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备内核镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1. 下载 内核源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    2. 配置编译选项
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    3. 编译
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rootfs" class="md-nav__link">
+    准备 rootfs 镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备 rootfs 镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-busybox" class="md-nav__link">
+    1. 下载 BusyBox
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    2. 配置编译选项
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_2" class="md-nav__link">
+    3. 编译
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4. 编写启动脚本
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-rootfs" class="md-nav__link">
+    5. 生成 rootfs 镜像
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gdb_1" class="md-nav__link">
+    gdb 调试内核
+  </a>
+  
+    <nav class="md-nav" aria-label="gdb 调试内核">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-qemu_1" class="md-nav__link">
+    1. 启动 QEMU
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-gdb" class="md-nav__link">
+    2. gdb 调试
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-fuzzer-syzkaller/" class="md-nav__link">
+        使用 Syzkaller
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../syscall-execution/" class="md-nav__link">
+        执行系统调用
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-filesystem/" class="md-nav__link">
+        根文件系统
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-security-principle/" class="md-nav__link">
+        内核安全机制设计思路
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ptmalloc2/" class="md-nav__link">
+        ptmalloc2
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heap-exp-house-of-xxx/" class="md-nav__link">
+        堆利用：House Of 系列
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qemu" class="md-nav__link">
+    安装 QEMU
+  </a>
+  
+    <nav class="md-nav" aria-label="安装 QEMU">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#0-ninja-re2c" class="md-nav__link">
+    0. 安装 Ninja 及其依赖 re2c
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-qemu" class="md-nav__link">
+    1. 下载 QEMU 源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2. 配置编译目标
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3. 编译、安装
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    准备内核镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备内核镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1. 下载 内核源码
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    2. 配置编译选项
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    3. 编译
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rootfs" class="md-nav__link">
+    准备 rootfs 镜像
+  </a>
+  
+    <nav class="md-nav" aria-label="准备 rootfs 镜像">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-busybox" class="md-nav__link">
+    1. 下载 BusyBox
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    2. 配置编译选项
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_2" class="md-nav__link">
+    3. 编译
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4. 编写启动脚本
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-rootfs" class="md-nav__link">
+    5. 生成 rootfs 镜像
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gdb_1" class="md-nav__link">
+    gdb 调试内核
+  </a>
+  
+    <nav class="md-nav" aria-label="gdb 调试内核">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-qemu_1" class="md-nav__link">
+    1. 启动 QEMU
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-gdb" class="md-nav__link">
+    2. gdb 调试
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="gdb">gdb 调试内核</h1>
+<h2 id="qemu">安装 QEMU</h2>
+<h3 id="0-ninja-re2c">0. 安装 <a href="https://github.com/ninja-build/ninja.git">Ninja</a> 及其依赖 <a href="http://re2c.org/index.html">re2c</a></h3>
+<pre><code class="language-bash">wget https://github.com/skvadrik/re2c/releases/download/2.1.1/re2c-2.1.1.tar.xz
+tar xf re2c-2.1.1.tar.xz
+cd re2c-2.1.1
+
+./configure
+make
+sudo make install
+</code></pre>
+<pre><code class="language-bash">git clone git://github.com/ninja-build/ninja.git
+cd ninja
+
+./configure.py --bootstrap
+sudo cp ninja /usr/bin
+</code></pre>
+<h3 id="1-qemu">1. 下载 <a href="https://download.qemu.org/?C=M;O=D">QEMU 源码</a></h3>
+<pre><code class="language-bash">wget https://download.qemu.org/qemu-6.0.0.tar.xz
+tar xf qemu-6.0.0.tar.xz
+</code></pre>
+<h3 id="2">2. 配置编译目标</h3>
+<p>配置前先安装编译依赖，--target-list 指定编译目标。-softmmu 后缀对应 QEMU 的系统模式，-linux-user 对应用户模式，将分别生成 qemu-system- 前缀和 qemu- 前缀的可执行程序。调试内核用前者：</p>
+<pre><code class="language-bash">cd qemu-6.0.0
+sudo apt build-dep qemu
+./configure --target-list=x86_64-softmmu,i386-softmmu
+</code></pre>
+<h3 id="3">3. 编译、安装</h3>
+<pre><code class="language-bash">make -j8
+sudo make install
+</code></pre>
+<h2 id="_1">准备内核镜像</h2>
+<h3 id="1">1. 下载 <a href="https://cdn.kernel.org/pub/linux/kernel">内核源码</a></h3>
+<pre><code class="language-bash">wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.12.3.tar.xz
+tar xf linux-5.12.3.tar.xz
+</code></pre>
+<h3 id="2_1">2. 配置编译选项</h3>
+<pre><code class="language-bash">cd linux-5.12.3
+make defconfig
+</code></pre>
+<p>有些调试选项不包含在默认配置中，可手动启用。在 make menuconfig 中按 / 可查找选项位置。</p>
+<ul>
+<li>CONFIG_DEBUG_INFO，带上调试信息，类似 gcc -g<ul>
+<li>Kernel hacking &gt; Compile-time checks and compiler options &gt; ...</li>
+</ul>
+</li>
+<li>gdb，kgdb 和 kdb 设置参考官方文档，相关选项 GDB_SCRIPT，FRAME_POINTER，KGDB 等<ul>
+<li><a href="https://www.kernel.org/doc/html/latest/dev-tools/gdb-kernel-debugging.html">使用 gdb 调试内核</a>，<a href="https://www.kernel.org/doc/html/latest/dev-tools/kgdb.html">启用 kgdb 和 kdb</a></li>
+</ul>
+</li>
+<li>视情况启用 KASAN、SLUB 等选项。<ul>
+<li>Kernel hacking &gt; Memory Debugging &gt; ...</li>
+</ul>
+</li>
+</ul>
+<h3 id="3_1">3. 编译</h3>
+<pre><code class="language-bash">make -j8
+</code></pre>
+<p>得到原始镜像 ./vmlinux 和压缩后的镜像 ./arch/x86/boot/bzImage。</p>
+<h2 id="rootfs">准备 rootfs 镜像</h2>
+<h3 id="1-busybox">1. 下载 <a href="https://busybox.net">BusyBox</a></h3>
+<pre><code class="language-bash">wget https://busybox.net/downloads/busybox-1.33.1.tar.bz2
+tar xf busybox-1.33.1.tar.bz2
+</code></pre>
+<h3 id="2_2">2. 配置编译选项</h3>
+<pre><code class="language-bash">cd busybox-1.33.1
+make menuconfig
+</code></pre>
+<p>启用 Settings &gt; Build static binary (no shared libs)。</p>
+<h3 id="3_2">3. 编译</h3>
+<pre><code class="language-bash">make -j8
+make install
+</code></pre>
+<p>得到 _install 目录。</p>
+<h3 id="4">4. 编写启动脚本</h3>
+<p>默认启动脚本为 etc/init.d/rcS，在其中挂载 /proc 和 /sys，创建设备节点：</p>
+<pre><code class="language-bash">cd _install
+mkdir -p etc/init.d
+vim etc/init.d/rcS
+</code></pre>
+<pre><code class="language-txt">#!/bin/sh
+mkdir proc &amp;&amp; mount -t proc proc /proc
+mkdir sys &amp;&amp; mount -t sysfs sysfs /sys
+/sbin/mdev -s
+</code></pre>
+<p>给启动脚本加上可执行权限：</p>
+<pre><code class="language-bash">chmod +x etc/init.d/rcS
+</code></pre>
+<h3 id="5-rootfs">5. 生成 rootfs 镜像</h3>
+<p>打包 _install 目录得到 rootfs 镜像，必须使用 newc 格式：</p>
+<pre><code class="language-bash">find . | cpio -o -H newc &gt; ../../rootfs.img
+</code></pre>
+<h2 id="gdb_1">gdb 调试内核</h2>
+<h3 id="1-qemu_1">1. 启动 QEMU</h3>
+<pre><code class="language-txt">qemu-system-x86_64 -kernel linux-5.12.3/arch/x86/boot/bzImage \
+                   -initrd rootfs.img \
+                   -append &quot;rdinit=/sbin/init console=ttyS0&quot; \
+                   -nographic -s
+</code></pre>
+<p>QEMU <a href="https://qemu-project.gitlab.io/qemu/system/invocation.html">启动参数</a> 很多，要看情况设置。上述启动命令涉及到的参数：</p>
+<ul>
+<li>-kernel 指定内核镜像 bzImage</li>
+<li>-initrd 指定根文件系统镜像。这里用准备好的 rootfs.img</li>
+<li>-append 指定内核参数<ul>
+<li>rdinit 指定 init 脚本路径，默认 /init。用 BusyBox 的话这里要重载为 /sbin/init</li>
+<li>console 重定向内核输出。这里重定向到串口设备 ttyS0，配合 -nographic 使用</li>
+</ul>
+</li>
+<li>-nographic 重定向串口的输入输出到当前 terminal，不启动图形界面，等效于 -serial stdio</li>
+<li>-s 在 1234 端口上启动 gdb server，等效于 -gdb tcp::1234</li>
+</ul>
+<p>退出 QEMU：terminal下，先按 Ctrl + a，再按 x ；图形界面下 Ctrl + Alt + q。</p>
+<h3 id="2-gdb">2. gdb 调试</h3>
+<pre><code class="language-bash">gdb linux-5.12.3/vmlinux
+</code></pre>
+<p>注意这里只是从 vmlinux 加载符号信息，相当于：</p>
+<pre><code class="language-txt">(gdb) file linux-5.12.3/vmlinux
+</code></pre>
+<p>但 target 是运行在 QEMU 中的内核，需要远程连接过去：</p>
+<pre><code class="language-txt">(gdb) target remote :1234
+</code></pre>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../bpf/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 从 BPF 到 eBPF" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              从 BPF 到 eBPF
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../kernel-fuzzer-syzkaller/" class="md-footer__link md-footer__link--next" aria-label="Next: 使用 Syzkaller" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              使用 Syzkaller
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+      
+        <script src="../javascripts/config.js"></script>
+      
+    
+  </body>
+</html>
