@@ -504,12 +504,12 @@ __libc_open64 (const char *file, int oflag, ...)
     (long int) resultvar;                       \
 })
 </code></pre>
-<p>先根据 <a href="/todo">调用约定</a> 传参到相应寄存器，然后通过 <a href="/todo">内联汇编</a> 执行 syscall 指令。</p>
+<p>先根据 <a href="../todo">调用约定</a> 传参到相应寄存器，然后通过 <a href="../todo">内联汇编</a> 执行 syscall 指令。</p>
 <h2 id="syscall-ring3-ring0"><a href="https://www.felixcloutier.com/x86/syscall">syscall 指令</a>：ring3 到 ring0</h2>
-<p>用户态和内核态的切换，本质是 CPU 特权级的改变。syscall 指令会将 CPL 设置为 0，即切换到内核态。该指令还将根据 <a href="/register#msr">MSR 寄存器</a> 更新 RIP，设置 CS 和 SS 这两个 <a href="/register#_1">段寄存器</a>。具体操作如下：</p>
+<p>用户态和内核态的切换，本质是 CPU 特权级的改变。syscall 指令会将 CPL 设置为 0，即切换到内核态。该指令还将根据 <a href="../register#msr">MSR 寄存器</a> 更新 RIP，设置 CS 和 SS 这两个 <a href="../register#_1">段寄存器</a>。具体操作如下：</p>
 <ol>
 <li>保存返回地址（即 syscall 下一条指令的地址，和 call 类似）到 RCX，保存 RFLAGS 到 R11；</li>
-<li>设置 RIP 为 IA32_LSTAR MSR 的值（wrmsr 指令保证这一定是个 <a href="/canonical-address">合规地址</a>）；</li>
+<li>设置 RIP 为 IA32_LSTAR MSR 的值（wrmsr 指令保证这一定是个 <a href="../canonical-address">合规地址</a>）；</li>
 <li>根据 IA32_FMASK MSR 清空 RFLAGS 的相应位；</li>
 <li>设置代码段寄存器 CS：<ul>
 <li>Selector = IA32_STAR[47:32] &amp; FFFCH，与操作是为了设置 RPL 为 0；</li>
@@ -590,7 +590,7 @@ __libc_open64 (const char *file, int oflag, ...)
     //...
 }
 </code></pre>
-<p>每次系统调用执行前都会 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/randomize_kstack.h#L35">add_random_kstack_offset()</a> 引入随机性，参见 <a href="/todo">KASLR</a>。<a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/nospec.h#L51">array_index_nospec()</a> 宏将非法 nr 修改为 0。因为即使有 if 判断，CPU 错误的分支预测仍可能导致非法 nr 被执行。执行系统调用根据系统调用号查表即可。</p>
+<p>每次系统调用执行前都会 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/randomize_kstack.h#L35">add_random_kstack_offset()</a> 引入随机性，参见 <a href="../todo">KASLR</a>。<a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/nospec.h#L51">array_index_nospec()</a> 宏将非法 nr 修改为 0。因为即使有 if 判断，CPU 错误的分支预测仍可能导致非法 nr 被执行。执行系统调用根据系统调用号查表即可。</p>
 <h3 id="sysret">执行 sysret 指令</h3>
 <p>在返回前，先从栈上的 pt_regs 恢复部分寄存器进行检查：</p>
 <ul>

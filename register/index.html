@@ -379,7 +379,7 @@
                   <h1>Register</h1>
                 
                 <h3 id="_1">段寄存器</h3>
-<p>在 <a href="/todo">分段</a> 机制中，一个段寄存器就是一个内存区域的描述。但是长模式下，分段机制被进一步弱化。通过非空 selector 进行内存访问时，基址和界限字段将被忽略，不检查越界，只检查地址是否合规。</p>
+<p>在 <a href="../todo">分段</a> 机制中，一个段寄存器就是一个内存区域的描述。但是长模式下，分段机制被进一步弱化。通过非空 selector 进行内存访问时，基址和界限字段将被忽略，不检查越界，只检查地址是否合规。</p>
 <h4 id="cs">CS</h4>
 <p>长模式下，代码段寄存器 CS 的基址和界限字段将被忽略，但是属性字段仍然保留。</p>
 <h4 id="dsss-es">DS、SS 和 ES</h4>
@@ -387,7 +387,7 @@
 <h4 id="fs-gs">FS 和 GS</h4>
 <p>长模式下，FS 和 GS 是唯二能体现分段思想的段寄存器，它们的基址是有意义的。</p>
 <p>这两个段的具体作用由 OS 决定。GDT 中没有它们的 descriptor，它们的 selector 可以设成 null。它们的基址通过特定的 MSR 寄存器设置。具体来说，FS 的基址由 <a href="#ia32_fs_base">IA32_FS_BASE</a> 指定，GS 的基址由 <a href="#ia32_gs_base">IA32_GS_BASE</a> 或 <a href="#ia32_kernel_gs_base">IA32_KERNEL_GS_BASE</a> 指定。</p>
-<p>一般来说，FS 用作 TLS。GS 用来放 per-cpu 数据，<a href="/todo">Canary</a> 从这里取。</p>
+<p>一般来说，FS 用作 TLS。GS 用来放 per-cpu 数据，<a href="../todo">Canary</a> 从这里取。</p>
 <h3 id="msr">MSR 寄存器</h3>
 <h4 id="ia32_fs_base">IA32_FS_BASE</h4>
 <p>存放 FS 基址。</p>

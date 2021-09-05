@@ -589,14 +589,14 @@
                 
                 <h1 id="syzkaller">使用 Syzkaller</h1>
 <h2 id="qemu">安装 QEMU</h2>
-<p>参考 <a href="/kernel-debugging-qemu-busybox-gdb/#qemu">gdb 调试内核：安装 QEMU</a>。</p>
+<p>参考 <a href="../kernel-debugging-qemu-busybox-gdb/#qemu">gdb 调试内核：安装 QEMU</a>。</p>
 <h2 id="_1">准备内核镜像</h2>
-<p>拉源码，配置，编译。流程参考 <a href="/kernel-debugging-qemu-busybox-gdb/#_1">gdb 调试内核：准备内核镜像</a>。Syzkaller 要求至少启用以下配置选项：</p>
+<p>拉源码，配置，编译。流程参考 <a href="../kernel-debugging-qemu-busybox-gdb/#_1">gdb 调试内核：准备内核镜像</a>。Syzkaller 要求至少启用以下配置选项：</p>
 <ul>
 <li>CONFIG_KCOV：采集覆盖率信息。</li>
 <li>CONFIG_DEBUG_INFO：带上调试信息。</li>
-<li>CONFIG_KASAN、CONFIG_KASAN_INLINE：开启 <a href="/todo">KASAN</a>，检测 OOB、UAF 等漏洞。INLINE 表示使用内联插桩，和外联插桩的区别是：外联插函数调用，占用空间小，但是慢；内联则展开函数直接插代码，省去了过程调用的开销，效率更高，代价是生成的镜像会大很多。</li>
-<li>CONFIG_CONFIGFS_FS、CONFIG_SECURITYFS：Syzkaller 使用 Debian 镜像作为 <a href="/root-filesystem">根文件系统</a>，为此需要启用 <a href="https://www.kernel.org/doc/html/latest/filesystems/configfs.html">configfs</a> 和 <a href="https://www.linux.org/threads/pipefs-sockfs-debugfs-and-securityfs.9638/">securityfs</a>。</li>
+<li>CONFIG_KASAN、CONFIG_KASAN_INLINE：开启 <a href="../todo">KASAN</a>，检测 OOB、UAF 等漏洞。INLINE 表示使用内联插桩，和外联插桩的区别是：外联插函数调用，占用空间小，但是慢；内联则展开函数直接插代码，省去了过程调用的开销，效率更高，代价是生成的镜像会大很多。</li>
+<li>CONFIG_CONFIGFS_FS、CONFIG_SECURITYFS：Syzkaller 使用 Debian 镜像作为 <a href="../root-filesystem">根文件系统</a>，为此需要启用 <a href="https://www.kernel.org/doc/html/latest/filesystems/configfs.html">configfs</a> 和 <a href="https://www.linux.org/threads/pipefs-sockfs-debugfs-and-securityfs.9638/">securityfs</a>。</li>
 </ul>
 <p>其他选项可参考 <a href="https://github.com/google/syzkaller/blob/master/docs/linux/kernel_configs.md">kernel_configs.md</a> 配置，也可以直接用 Syzkaller 提供的 <a href="https://github.com/google/syzkaller/blob/master/dashboard/config/linux/upstream-apparmor-kasan.config">.config</a> 文件。</p>
 <h3 id="quick-start">Quick Start</h3>

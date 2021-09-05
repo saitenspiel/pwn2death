@@ -458,7 +458,7 @@
 <p><a href="http://www.linfo.org/root_filesystem.html">The Linux Information Project</a>: The contents will include the files that are necessary for booting the system and for bringing it up to such a state that the other filesystems can be mounted as well as tools for fixing a broken system and for recovering lost files from backups.</p>
 </blockquote>
 <p>也就是说，根文件系统可以任意大，但不能任意小。为了保证系统成功引导，它至少要包含 init 脚本及其依赖的配置文件。在此基础上再去支持其他功能。另一方面，尽管可以任意大，但根文件系统是越小越好的。一是节省存储，根文件系统一般包含特定设备驱动，不通用，都是各用各的本地镜像。这在嵌入式场景下尤其重要；二是降低故障率，体积小便于维护。</p>
-<p>挂载根文件系统最大的困难是要适配不同硬件。根文件系统可能存储在各类设备中，它们有各自的驱动。对于发行版来说，把驱动直接编译进内核是不可行的。因为发行版要适配大量设备，把所有驱动模块全编译进去会让内核臃肿得难以想象，而且每次更新驱动都要重新发布内核。另一方面，以 <a href="/todo">LKM</a> 的方式编译驱动也不可行，因为 bootloader 只负责加载内核，驱动模块的选择和加载得由用户程序完成，这就产生了死锁：</p>
+<p>挂载根文件系统最大的困难是要适配不同硬件。根文件系统可能存储在各类设备中，它们有各自的驱动。对于发行版来说，把驱动直接编译进内核是不可行的。因为发行版要适配大量设备，把所有驱动模块全编译进去会让内核臃肿得难以想象，而且每次更新驱动都要重新发布内核。另一方面，以 <a href="../todo">LKM</a> 的方式编译驱动也不可行，因为 bootloader 只负责加载内核，驱动模块的选择和加载得由用户程序完成，这就产生了死锁：</p>
 <ul>
 <li>必须先挂载根文件系统才能加载驱动，因为驱动和加载程序都在根文件系统中。</li>
 <li>必须先加载驱动才能挂载根文件系统，因为挂载文件系统需要设备驱动。</li>
@@ -475,10 +475,10 @@
 <ol>
 <li>bootloader 加载 initrd 镜像到内存。</li>
 <li>内核将内存中的 initrd 解压到 /dev/ram0，将其当作 rootfs 挂载，并调用其中的 init 脚本 /linuxrc。</li>
-<li>/linuxrc 挂载根文件系统，并调用 <a href="/todo">pivot_root()</a> 将其设为根目录。</li>
+<li>/linuxrc 挂载根文件系统，并调用 <a href="../todo">pivot_root()</a> 将其设为根目录。</li>
 <li>内核解挂载 /dev/ram0，释放其占用的内存，然后调根文件系统的 /sbin/init。</li>
 </ol>
-<p>对 ramdisk 的 I/O 相当于磁盘 I/O，这意味着：第一，会触发 <a href="/todo">页缓存</a>。而 ramdisk 的数据本来就在内存，没必要去浪费页缓存。第二，需要驱动。ramdisk 用的是 ext2 这样的磁盘文件系统，必须将相应驱动编译进内核中。</p>
+<p>对 ramdisk 的 I/O 相当于磁盘 I/O，这意味着：第一，会触发 <a href="../todo">页缓存</a>。而 ramdisk 的数据本来就在内存，没必要去浪费页缓存。第二，需要驱动。ramdisk 用的是 ext2 这样的磁盘文件系统，必须将相应驱动编译进内核中。</p>
 <p>initramfs 方案更为简洁。它不在内存中模拟磁盘，而是直接建立文件系统：</p>
 <ol>
 <li>bootloader 加载 initramfs 镜像到内存，其可以是独立的外部镜像，也可以编译进内核的 .init.ramfs 段中。</li>
