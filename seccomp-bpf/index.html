@@ -1,0 +1,721 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.2.6">
+    
+    
+      
+        <title>Seccomp BPF - pwn2death</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.802231af.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/github.min.css">
+    
+      <link rel="stylesheet" href="../css/list-marker.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#seccomp-bpf" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="pwn2death" class="md-header__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pwn2death
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Seccomp BPF
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="pwn2death" class="md-nav__button md-logo" aria-label="pwn2death" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    pwn2death
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bpf/" class="md-nav__link">
+        从 BPF 到 eBPF
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Seccomp BPF
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Seccomp BPF
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    编写过滤器
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    安装过滤器
+  </a>
+  
+    <nav class="md-nav" aria-label="安装过滤器">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no_new_privs" class="md-nav__link">
+    no_new_privs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccomp" class="md-nav__link">
+    seccomp()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prctl" class="md-nav__link">
+    prctl()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    内核执行
+  </a>
+  
+    <nav class="md-nav" aria-label="内核执行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    安装过滤器
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    过滤系统调用
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-nav__link">
+        gdb 调试内核
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-fuzzer-syzkaller/" class="md-nav__link">
+        使用 Syzkaller
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../syscall-execution/" class="md-nav__link">
+        执行系统调用
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../root-filesystem/" class="md-nav__link">
+        根文件系统
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kernel-security-principle/" class="md-nav__link">
+        内核安全机制设计思路
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ptmalloc2/" class="md-nav__link">
+        ptmalloc2
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heap-exp-house-of-xxx/" class="md-nav__link">
+        堆利用：House Of 系列
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    编写过滤器
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    安装过滤器
+  </a>
+  
+    <nav class="md-nav" aria-label="安装过滤器">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#no_new_privs" class="md-nav__link">
+    no_new_privs
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#seccomp" class="md-nav__link">
+    seccomp()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prctl" class="md-nav__link">
+    prctl()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    内核执行
+  </a>
+  
+    <nav class="md-nav" aria-label="内核执行">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    安装过滤器
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    过滤系统调用
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="seccomp-bpf">Seccomp BPF</h1>
+<p>参见 <a href="https://lwn.net/Articles/656307/">A seccomp overview</a>。BPF 相关参见 <a href="../bpf">从 BPF 到 eBPF</a>。</p>
+<p>Seccomp（SECure COMPuting）源自 05 年的一个 <a href="https://lwn.net/Articles/120192/">patch</a>，只允许进程执行 4 个系统调用 read()、write()、exit() 和 <a href="../todo">sigreturn()</a>，其他系统调用将导致进程终止。思路是在系统调用入口处过滤，根据系统调用号拦截不在白名单中的系统调用。</p>
+<p>这一版本的 seccomp 在实现上缺乏灵活性，白名单硬编码在内核中，无法在运行时配置。BPF 引入后，<a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e2cfabdfd075648216f99c2c03821cf3f47c1727">改用 BPF 实现</a>，3.4 发布，沿用至今。</p>
+<p><a href="https://www.kernel.org/doc/html/latest/userspace-api/seccomp_filter.html">Seccomp BPF</a> 方案在执行系统调用前运行安装在当前进程上的所有过滤器。过滤器描述为 cBPF，在用户空间编写，附加到进程后生效，内核将其转换为 eBPF 执行。</p>
+<p>而早期实现虽然不灵活，但是简单，在数值计算这种不需要其他系统调用的场景有效率优势，因此也保留了下来，即 seccomp 的 strict 模式。</p>
+<h2 id="_1">编写过滤器</h2>
+<p>Seccomp 过滤器使用 cBPF 指令 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/filter.h#L24">sock_filter</a>：</p>
+<pre><code class="language-c">struct sock_filter {    /* Filter block */
+    __u16   code;       /* Actual filter code */
+    __u8    jt;         /* Jump true */
+    __u8    jf;         /* Jump false */
+    __u32   k;          /* Generic multiuse field */
+};
+</code></pre>
+<p>指令序列及长度封装为 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/filter.h#L31">sock_fprog</a>： </p>
+<pre><code class="language-c">struct sock_fprog {
+    unsigned short len;    /* Number of filter blocks */
+    struct sock_filter __user *filter;
+};
+</code></pre>
+<p>过滤器根据以下信息决定响应方式：</p>
+<ul>
+<li>nr：系统调用号，<a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/uapi/asm/unistd.h#L13">__X32_SYSCALL_BIT</a> 如果设置了，也会包含在内；</li>
+<li>arch ：系统架构 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/audit.h#L383">AUDIT_ARCH_*</a>；</li>
+<li>instruction_pointer：系统调用的返回地址；</li>
+<li>args[6]：系统调用参数，无论类型和架构，均按 u64 处理，不会解引用指针。</li>
+</ul>
+<p>典型结构为：</p>
+<pre><code class="language-c">if (arch != ARCH_X86_64)
+    return KILL;
+return ALLOW;
+</code></pre>
+<p>分解为 cBPF 指令：</p>
+<ol>
+<li>BPF_LD | BPF_W | BPF_ABS 指令：将 seccomp_data 在 k = 4 字节偏移处的 32 位数据，即 arch 字段，压入寄存器 A；</li>
+<li>BPF_JMP | BPF_JEQ | BPF_K 指令：比较 A 与 k = ARCH_X86_64，jt = 0 指向下一条指令，jf = 1 指向下下一条指令；</li>
+<li>BPF_RET | BPF_K 指令：返回 k = ALLOW；</li>
+<li>BPF_RET | BPF_K 指令：返回 k = KILL；</li>
+</ol>
+<p>使用 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/filter.h#L49">BPF_STMT/BPF_JUMP</a> 宏描述该指令序列：</p>
+<pre><code class="language-c">struct sock_filter f[] = {
+    BPF_STMT(BPF_LD | BPF_W | BPF_ABS, 4);
+    BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_X86_64, 0, 1);
+    BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW);
+    BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL);
+}
+</code></pre>
+<p>封装为 sock_fprog：</p>
+<pre><code class="language-c">struct sock_fprog prog = {
+    .len = 4
+    .filter = f,
+};
+</code></pre>
+<p>过滤器的返回值 32 位。低 16 位用于回传数据；高 16 位为 action = <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L36">SECCOMP_RET_*</a>，优先级从高到低为：</p>
+<ul>
+<li>拒绝：<ul>
+<li>SECCOMP_RET_KILL_PROCESS：以 SIGSYS 终止当前进程组的所有进程；</li>
+<li>SECCOMP_RET_KILL{_THREAD}：以 SIGSYS 终止当前进程；</li>
+<li>SECCOMP_RET_TRAP：向当前进程发送 SIGSYS；</li>
+<li>SECCOMP_RET_ERRNO：返回自定义错误号，放在低 16 位中；</li>
+</ul>
+</li>
+<li>询问用户空间，无应答则返回错误号 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/asm-generic/errno.h#L18">ENOSYS</a>：<ul>
+<li>SECCOMP_RET_USER_NOTIF：unotify 机制，让用户空间决定如何响应；</li>
+<li>SECCOMP_RET_TRACE：让 tracer 决定如何响应；</li>
+</ul>
+</li>
+<li>允许：<ul>
+<li>SECCOMP_RET_LOG：登记日志，允许该系统调用；</li>
+<li>SECCOMP_RET_ALLOW，允许该系统调用。</li>
+</ul>
+</li>
+</ul>
+<p>如果有多个过滤器，依次运行，按优先级最高的 action 响应。</p>
+<h2 id="_2">安装过滤器</h2>
+<h3 id="no_new_privs"><a href="https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html">no_new_privs</a></h3>
+<p>no_new_privs 是一个进程标志，记录在 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/sched.h#L857">task_struct-&gt;atomic_flags</a> 的最低位（<a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/sched.h#L1636">PFA_NO_NEW_PRIVS</a>）。通过 prctl() 的 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/prctl.h#L175">PR_SET_NO_NEW_PRIVS</a> 选项设置：</p>
+<pre><code class="language-c">prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0);
+</code></pre>
+<p>带有该标志的进程无法通过 execve() 提升权限，如执行带 S 位的文件时，uid/gid 保持不变。fork()/clone() 的子进程会继承该标志位。execve() 不会覆盖该标志位。</p>
+<p>安装过滤器，即将过滤器附加到当前进程，要求进程有 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/capability.h#L279">CAP_SYS_ADMIN</a> 权限，或者设置了 no_new_privs 标志位。否则低权限进程可以利用过滤器提权。</p>
+<p>考虑一个针对 setuid() 的过滤器，它允许 setuid(0)，但对于 setuid(uid&gt;0) 返回错误号 0。如果没有 no_new_privs 限制，持有该过滤器的进程 execve() 一个属于 root 用户的、带 S 位的文件即可获得 root 权限。</p>
+<h3 id="seccomp"><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1949">seccomp()</a></h3>
+<p>通过系统调用 seccomp() 的 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L16">SECCOMP_SET_MODE_FILTER</a> 选项安装过滤器：</p>
+<pre><code class="language-c">seccomp(SECCOMP_SET_MODE_FILTER, flags, args);
+</code></pre>
+<p>args 指向用户定义的 sock_fprog，flags = <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L21">SECCOMP_FILTER_FLAG_*</a>，包括：</p>
+<ul>
+<li>SECCOMP_FILTER_FLAG_TSYNC：同步过滤器到进程组其他进程；</li>
+<li>SECCOMP_FILTER_FLAG_LOG：登记 action 日志；</li>
+<li>SECCOMP_FILTER_FLAG_SPEC_ALLOW：不执行 <a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/kernel/cpu/bugs.c#L1333">arch_seccomp_spec_mitigate()</a>；</li>
+<li>SECCOMP_FILTER_FLAG_NEW_LISTENER：返回文件描述符，用于 unotify 机制；</li>
+</ul>
+<p>另外，可以通过 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L15">SECCOMP_SET_MODE_STRICT</a> 选项启用 strict 模式：</p>
+<pre><code class="language-c">seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL);
+</code></pre>
+<h3 id="prctl">prctl()</h3>
+<p>prctl() 提供 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/prctl.h#L68">PR_SET_SECCOMP</a> 选项，功能是 seccomp() 的子集。</p>
+<ul>
+<li>安装过滤器，等价于 <code>seccomp(SECCOMP_SET_MODE_FILTER, 0, args)</code>：</li>
+</ul>
+<pre><code class="language-c">prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, args);  // flags not supported
+</code></pre>
+<ul>
+<li>启用 strict 模式，等价于 <code>seccomp(SECCOMP_SET_MODE_STRICT, 0, NULL)</code>：</li>
+</ul>
+<pre><code class="language-c">prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT);
+</code></pre>
+<h2 id="_3">内核执行</h2>
+<h3 id="_4">安装过滤器</h3>
+<p>seccomp() 和 prctl() 都是调用 <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1924">do_seccomp()</a> -&gt; <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1787">seccomp_set_mode_filter()</a>：</p>
+<ol>
+<li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L685">seccomp_prepare_user_filter()</a> 将用户传入的 sock_fprog 转换为 eBPF 格式。其先 copy_from_user() 取得 sock_fprog，然后调用 <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L632">seccomp_prepare_filter()</a>：<ol>
+<li>检查指令长度，必须大于 0，且不超过 4096（<a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/bpf_common.h#L54">BPF_MAXINSNS</a>）；</li>
+<li>检查权限，current 必须有 CAP_SYS_ADMIN 权限，或设置了 no_new_privs 标志；</li>
+<li>调用 <a href="../bpf#_9">bpf_prog_create_from_user() 将 sock_fprog 转换为 bpf_prog</a>，即过滤器的 eBPF 表示，记录在 <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L215">seccomp_filter</a> 中。</li>
+</ol>
+</li>
+<li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L860">seccomp_attach_filter()</a> 将 eBPF 过滤器头插到 current 持有的过滤器单链表，如果指定了 TSYNC 标志，调用 <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L575">seccomp_sync_threads()</a> 同步过滤器；</li>
+<li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L437">seccomp_assign_mode()</a> 设置 current 为 filter 模式，通过 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/thread_info.h#L141">set_task_syscall_work()</a> 宏设置 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/thread_info.h#L41">SYSCALL_WORK_BIT_SECCOMP</a> 位。</li>
+</ol>
+<p>第 2 步的过滤器链表通过 seccomp_filter 的 prev 字段维护，头节点 filter 记录在结构体 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/seccomp.h#L35">seccomp</a> 中：</p>
+<pre><code class="language-c">struct seccomp {
+    int mode;                         // filter or strict
+    atomic_t filter_count;
+    struct seccomp_filter *filter;    // accessed without locking
+};
+</code></pre>
+<p>seccomp 是 task_struct 的成员，但只有 current 才能访问 filter。fork()/clone() 的子进程会继承父进程的 filter，因此不同过滤器可以有相同的 prev。execve() 不会覆盖 filter。</p>
+<h3 id="_5">过滤系统调用</h3>
+<p>执行系统调用前，<a href="../syscall-execution#_3">do_syscall_64() 会先进行 thread_info-&gt;syscall_work 要求的工作</a>。安装过滤器时设置了 SYSCALL_WORK_BIT_SECCOMP 位，因此会进入 <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/entry/common.c#L44">syscall_trace_enter()</a> 并运行过滤器：</p>
+<pre><code class="language-c">/* Do seccomp after ptrace, to catch any tracer changes. */
+if (work &amp; SYSCALL_WORK_SECCOMP) {
+    ret = __secure_computing(NULL);
+    //...
+}
+</code></pre>
+<p><a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/thread_info.h#L50">SYSCALL_WORK_SECCOMP</a> 是对应掩码。<a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1301">__secure_computing()</a> 将调用 <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1164">__seccomp_filter()</a> 运行 current 上的过滤器：</p>
+<ol>
+<li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L234">populate_seccomp_data()</a> 收集系统调用信息，即 nr，arch，instruction_pointer 和 args[6]，封装为结构体 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L60">seccomp_data</a>；</li>
+<li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L394">seccomp_run_filters()</a> 从 current.seccomp-&gt;filter 起依次运行链表上所有过滤器，优先级最高的 action 作为最终响应。</li>
+</ol>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../bpf/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 从 BPF 到 eBPF" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              从 BPF 到 eBPF
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-footer__link md-footer__link--next" aria-label="Next: gdb 调试内核" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              gdb 调试内核
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.409db549.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.756773cc.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+      
+        <script src="../javascripts/config.js"></script>
+      
+    
+  </body>
+</html>

@@ -175,6 +175,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../seccomp-bpf/" class="md-nav__link">
+        Seccomp BPF
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-nav__link">
         gdb 调试内核
       </a>
@@ -589,9 +604,9 @@
                 
                 <h1 id="syzkaller">使用 Syzkaller</h1>
 <h2 id="qemu">安装 QEMU</h2>
-<p>参考 <a href="../kernel-debugging-qemu-busybox-gdb/#qemu">gdb 调试内核：安装 QEMU</a>。</p>
+<p>参考 <a href="../kernel-debugging-qemu-busybox-gdb#qemu">gdb 调试内核：安装 QEMU</a>。</p>
 <h2 id="_1">准备内核镜像</h2>
-<p>拉源码，配置，编译。流程参考 <a href="../kernel-debugging-qemu-busybox-gdb/#_1">gdb 调试内核：准备内核镜像</a>。Syzkaller 要求至少启用以下配置选项：</p>
+<p>拉源码，配置，编译。流程参考 <a href="../kernel-debugging-qemu-busybox-gdb#_1">gdb 调试内核：准备内核镜像</a>。Syzkaller 要求至少启用以下配置选项：</p>
 <ul>
 <li>CONFIG_KCOV：采集覆盖率信息。</li>
 <li>CONFIG_DEBUG_INFO：带上调试信息。</li>
