@@ -93,7 +93,7 @@ BPF 最早的内核实现是 2.1.75 版本的 [/net/core/filter.c](https://elixi
 - 如果本 pass 与上一 pass 生成的 native code 长度相同，表明编译成功，放入 module_alloc() 的内存中；如果始终不收敛，放弃编译；
 - 通过 [SK_RUN_FILTER](https://elixir.bootlin.com/linux/v3.0/source/include/linux/filter.h#L163) 宏调用 [sk_filter-> bpf_func](https://elixir.bootlin.com/linux/v3.0/source/include/linux/filter.h#L142)，如果编译成功，该函数指针指向生成的 native code，否则指向 [sk_run_filter()](https://elixir.bootlin.com/linux/v3.0/source/net/core/filter.c#L112)。
 
-函数指针 bpf_func 让 BPF 可以方便地迁移到其他场景，不再局限于 socket 上的过滤。内核 3.4 起，BPF 应用于系统调用的过滤 [seccomp](../todo)。
+函数指针 bpf_func 让 BPF 可以方便地迁移到其他场景，不再局限于 socket 上的过滤。内核 3.4 起，BPF 应用于系统调用的过滤 [seccomp](../seccomp-bpf)。
 
 ## eBPF
 eBPF 最开始是作为一种中间表示在 3.15 引入，使用全新的指令集。BPF 程序加载到内核时，优先进行 JIT 编译，如果编译失败，则调用 [sk_convert_filter()](https://elixir.bootlin.com/linux/v3.15/source/net/core/filter.c#L863) 将其转化为中间表示，之后通过 [__sk_run_filter()](https://elixir.bootlin.com/linux/v3.15/source/net/core/filter.c#L141) 运行。
@@ -190,7 +190,7 @@ eBPF 程序通过 [bpf_prog->bpf_func](https://elixir.bootlin.com/linux/v5.13/so
 相关内核变量 bpf_jit_enable，内核选项 CONFIG_{BPF_JIT、BPF_JIT_ALWAYS_ON、HAVE_EBPF_JIT}。
 JIT 编译只要可用，就会应用在所有过滤器上，没有类似 JVM 的 hotspot 机制。目前主流架构都支持 JIT 编译，但对高级特性如 bpf2bpf call 的支持还不成熟。
 
-bpf_func 接收两个参数 ctx 和 insn。ctx 为 void 指针，指向待过滤数据，根据 eBPF 程序类型解析为不同数据结构，如 skb，参见 [bpf_types.h](https://elixir.bootlin.com/linux/v5.13/source/include/linux/bpf_types.h)。insn 指向 eBPF 指令序列，仅用于解释执行。JIT 编译执行时，ctx 通过 CPU 寄存器自然传递，如 x86 的 RDI。解释执行时，解释器会先 [将 ctx 放入 R1](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/core.c#L1702)。
+bpf_func 接收两个参数 ctx 和 insn。ctx 为 void 指针，指向待过滤数据，根据 eBPF 程序类型解析为不同数据结构，如 skb，参见 [bpf_types.h](https://elixir.bootlin.com/linux/v5.13/source/include/linux/bpf_types.h)。insn 指向 eBPF 指令序列，仅用于解释执行。JIT 编译执行时，ctx 通过 CPU 寄存器自然传递，如 x64 的 RDI。解释执行时，解释器会先 [将 ctx 放入 R1](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/core.c#L1702)。
 
 eBPF 程序通过 BPF_EXIT 指令退出，退出前必须显式保存返回值到 R0。解释器遇到 BPF_EXIT 指令直接返回 R0 即可。x64 的 JIT 编译器仍使用帧指针 RBP，因此，对于 BPF_EXIT 需先发射 leave 指令再 ret。
 
@@ -280,3 +280,37 @@ eBPF 程序运行在内核态，加载到内核时调用 [bpf_check()](https://e
 6. check_max_stack_depth()：检查 bpf2bpf call 的栈深；
 7. do_misc_fixups() 重写 func_id，处理 tail call 等；
 8. fixup_call_args()：处理 bpf2bpf call。
+
+### 后向兼容
+#### cBPF
+[bpf_prog_create_from_user()](https://elixir.bootlin.com/linux/v5.13/source/net/core/filter.c#L1402) 将用户空间传入的 cBPF 程序 [sock_fprog](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/filter.h#L31) 转换成 eBPF 程序 bpf_prog 运行。其通过 copy_from_user() 取得 cBPF 指令，然后调用 [bpf_prepare_filter()](https://elixir.bootlin.com/linux/v5.13/source/net/core/filter.c#L1308)：
+
+1. [bpf_check_classic()](https://elixir.bootlin.com/linux/v5.13/source/net/core/filter.c#L1051) 检查 cBPF 程序，指令必须合法，跳转不能越界，必须以 ret 结尾，只有写过的 M[] 才能读；
+2. [bpf_migrate_filter()](https://elixir.bootlin.com/linux/v5.13/source/net/core/filter.c#L1237) 调用两次 [bpf_convert_filter()](https://elixir.bootlin.com/linux/v5.13/source/net/core/filter.c#L555) 完成转换。第一次计算指令长度，分配内存，第二次正式转换：A 对应 R0，X 对应 R7，M[] 对应帧寄存器 R10；
+3. [bpf_prog_select_runtime()](https://elixir.bootlin.com/linux/v5.13/source/kernel/bpf/core.c#L1840) 尝试 JIT 编译得到的 eBPF 程序，失败则解释执行。
+
+#### 32 位机器
+eBPF 是 64 位的虚拟机，如果要在 32 位机器上 JIT 编译执行，寄存器要么映射为两个 CPU 寄存器，要么映射到栈上。x86 的 JIT 编译器采用后一种做法，eBPF 寄存器映射到 EBP 上方预留的一段栈空间，通过 EBP 寻址，栈帧如下：
+```text
++-------------------+ <- old ESP
+| callee-saved regs |
++-------------------+
+| eBPF regs mapping |
++-------------------+ <- EBP = R10
+| bpf prog stack    |
++-------------------+ <- ESP
+```
+[emit_prologue()](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/net/bpf_jit_comp32.c#L1199) 负责建立栈帧，[SCRATCH_SIZE](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/net/bpf_jit_comp32.c#L177) 即预留空间大小：
+```x86asm
+push ebp
+mov ebp, esp
+
+push edi
+push esi
+push ebx
+
+; STACK_SIZE = SCRATCH_SIZE + stack depth required by bpf_prog, 8-byte aligned
+sub esp,STACK_SIZE
+; SCRATCH_SIZE = 0x60, for R0-R10 and tail_call_cnt
+sub ebp,SCRATCH_SIZE+12
+```

@@ -1,9 +1,9 @@
 # 使用 Syzkaller
 ## 安装 QEMU
-参考 [gdb 调试内核：安装 QEMU](../kernel-debugging-qemu-busybox-gdb/#qemu)。
+参考 [gdb 调试内核：安装 QEMU](../kernel-debugging-qemu-busybox-gdb#qemu)。
 
 ## 准备内核镜像
-拉源码，配置，编译。流程参考 [gdb 调试内核：准备内核镜像](../kernel-debugging-qemu-busybox-gdb/#_1)。Syzkaller 要求至少启用以下配置选项：
+拉源码，配置，编译。流程参考 [gdb 调试内核：准备内核镜像](../kernel-debugging-qemu-busybox-gdb#_1)。Syzkaller 要求至少启用以下配置选项：
 
 - CONFIG_KCOV：采集覆盖率信息。
 - CONFIG_DEBUG_INFO：带上调试信息。

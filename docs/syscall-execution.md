@@ -94,10 +94,10 @@ IA32_LSTAR 被设置为一段汇编指令 entry_SYSCALL_64 的地址，这就是
 
 IA32_FMASK 设置了 X86_EFLAGS_IF 位，意味着 syscall 指令会清除 RFLAGS 的 IF 位，可屏蔽中断将被屏蔽。禁止中断重入的一个原因是 swapgs 指令不支持。
 
-注意 syscall 指令既不更新也不保存 RSP，这一任务将由内核完成。
+syscall 指令既不更新也不保存 RSP，这一任务将由内核完成。
 
 ## [entry_SYSCALL_64](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/entry_64.S#L87)
-作为系统调用的内核入口，entry_SYSCALL_64 会先进行一些准备工作，然后执行系统调用，最后使用 sysret 指令返回到用户态。
+作为系统调用的内核入口，entry_SYSCALL_64 先进行一些准备工作，然后执行系统调用，最后使用 sysret 指令返回到用户态。
 
 ### 准备工作
 1. 执行 swapgs 指令，交换 IA32_GS_BASE 和 IA32_KERNEL_GS_BASE 这两个 MSR 寄存器的值，让 GS 段指向内核 per-cpu 数据区域；
@@ -132,19 +132,32 @@ IA32_FMASK 设置了 X86_EFLAGS_IF 位，意味着 syscall 指令会清除 RFLAG
     movq	%rsp, %rsi      ; %rsi = &pt_regs (2nd arg)
     call	do_syscall_64
 ```
-系统调用的执行函数为 [do_syscall_64()](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/common.c#L39)：
+[do_syscall_64()](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/entry/common.c#L39) 即系统调用的执行函数：
 ```c
 __visible noinstr void do_syscall_64(unsigned long nr, struct pt_regs *regs)
 {
-	add_random_kstack_offset(); // so the (kernel) stack base varies between syscalls
+    // so the kernel stack base varies between syscalls
+	add_random_kstack_offset();
+    nr = syscall_enter_from_user_mode(regs, nr);
 	//...
 	if (likely(nr < NR_syscalls)) {
-		nr = array_index_nospec(nr, NR_syscalls); // clamp 'nr' within [0, NR_syscalls)
-		regs->ax = sys_call_table[nr](regs); // the return value will overwrite -ENOSYS
+        // clamp 'nr' within [0, NR_syscalls)
+		nr = array_index_nospec(nr, NR_syscalls);
+        // the return value will overwrite -ENOSYS
+		regs->ax = sys_call_table[nr](regs);
     //...
 }
 ```
-每次系统调用执行前都会 [add_random_kstack_offset()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/randomize_kstack.h#L35) 引入随机性，参见 [KASLR](../todo)。[array_index_nospec()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/nospec.h#L51) 宏将非法 nr 修改为 0。因为即使有 if 判断，CPU 错误的分支预测仍可能导致非法 nr 被执行。执行系统调用根据系统调用号查表即可。
+对应流程为：
+
+1. [add_random_kstack_offset()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/randomize_kstack.h#L35) 为内核栈基址引入随机性，参见 [KASLR](../todo)。
+2. [syscall_enter_from_user_mode()](https://elixir.bootlin.com/linux/v5.13/source/kernel/entry/common.c#L100) 调用：
+    1. [__enter_from_user_mode()](https://elixir.bootlin.com/linux/v5.13/source/kernel/entry/common.c#L16)：通知 [lockdep]() 可屏蔽中断已屏蔽等；
+    2. [__syscall_enter_from_user_work()](https://elixir.bootlin.com/linux/v5.13/source/kernel/entry/common.c#L85)：完成 [thread_info->syscall_work](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/asm/thread_info.h#L58) 要求的工作，如 [系统调用过滤](../seccomp-bpf) 等；
+3. [array_index_nospec()](https://elixir.bootlin.com/linux/v5.13/source/include/linux/nospec.h#L51) 宏将非法 nr 修改为 0。因为即使有 if 判断，CPU 错误的分支预测仍可能导致非法 nr 被执行；
+4. 根据系统调用号查表，执行系统调用。
+
+如果系统调用号设置了 [__X32_SYSCALL_BIT](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/uapi/asm/unistd.h#L13) 位，将查找 32 位的系统调用表。
 
 ### 执行 sysret 指令
 在返回前，先从栈上的 pt_regs 恢复部分寄存器进行检查：
