@@ -3,6 +3,7 @@ nav:
   - '': 'index.md'
   - 'bpf.md'
   - 'seccomp-bpf.md'
+  - 'memory-virtualization.md'
   - 'kernel-debugging-qemu-busybox-gdb.md'
   - 'kernel-fuzzer-syzkaller.md'
   - 'syscall-execution.md'
