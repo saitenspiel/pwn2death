@@ -27,7 +27,7 @@ struct sock_fprog {
     struct sock_filter __user *filter;
 };
 ```
-过滤器根据以下信息决定响应方式：
+过滤器根据封装为结构体 [seccomp_data](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L60) 的系统调用信息进行响应：
 
 - nr：系统调用号，[__X32_SYSCALL_BIT](https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/uapi/asm/unistd.h#L13) 如果设置了，也会包含在内；
 - arch ：系统架构 [AUDIT_ARCH_*](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/audit.h#L383)；
@@ -156,7 +156,7 @@ if (work & SYSCALL_WORK_SECCOMP) {
 ```
 [SYSCALL_WORK_SECCOMP](https://elixir.bootlin.com/linux/v5.13/source/include/linux/thread_info.h#L50) 是对应掩码。[__secure_computing()](https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1301) 将调用 [__seccomp_filter()](https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1164) 运行 current 上的过滤器：
 
-1. [populate_seccomp_data()](https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L234) 收集系统调用信息，即 nr，arch，instruction_pointer 和 args[6]，封装为结构体 [seccomp_data](https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L60)；
+1. [populate_seccomp_data()](https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L234) 收集系统调用信息，即 nr，arch，instruction_pointer 和 args[6]，封装为 seccomp_data；
 2. [seccomp_run_filters()](https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L394) 从 current.seccomp->filter 起依次运行链表上所有过滤器，优先级最高的 action 作为最终响应。
 
 
