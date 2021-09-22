@@ -291,6 +291,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../memory-virtualization/" class="md-nav__link">
+        内存虚拟化
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-nav__link">
         gdb 调试内核
       </a>
@@ -515,7 +530,7 @@
     struct sock_filter __user *filter;
 };
 </code></pre>
-<p>过滤器根据以下信息决定响应方式：</p>
+<p>过滤器根据封装为结构体 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L60">seccomp_data</a> 的系统调用信息进行响应：</p>
 <ul>
 <li>nr：系统调用号，<a href="https://elixir.bootlin.com/linux/v5.13/source/arch/x86/include/uapi/asm/unistd.h#L13">__X32_SYSCALL_BIT</a> 如果设置了，也会包含在内；</li>
 <li>arch ：系统架构 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/audit.h#L383">AUDIT_ARCH_*</a>；</li>
@@ -634,7 +649,7 @@ if (work &amp; SYSCALL_WORK_SECCOMP) {
 </code></pre>
 <p><a href="https://elixir.bootlin.com/linux/v5.13/source/include/linux/thread_info.h#L50">SYSCALL_WORK_SECCOMP</a> 是对应掩码。<a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1301">__secure_computing()</a> 将调用 <a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L1164">__seccomp_filter()</a> 运行 current 上的过滤器：</p>
 <ol>
-<li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L234">populate_seccomp_data()</a> 收集系统调用信息，即 nr，arch，instruction_pointer 和 args[6]，封装为结构体 <a href="https://elixir.bootlin.com/linux/v5.13/source/include/uapi/linux/seccomp.h#L60">seccomp_data</a>；</li>
+<li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L234">populate_seccomp_data()</a> 收集系统调用信息，即 nr，arch，instruction_pointer 和 args[6]，封装为 seccomp_data；</li>
 <li><a href="https://elixir.bootlin.com/linux/v5.13/source/kernel/seccomp.c#L394">seccomp_run_filters()</a> 从 current.seccomp-&gt;filter 起依次运行链表上所有过滤器，优先级最高的 action 作为最终响应。</li>
 </ol>
                 
@@ -672,13 +687,13 @@ if (work &amp; SYSCALL_WORK_SECCOMP) {
       
       
         
-        <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-footer__link md-footer__link--next" aria-label="Next: gdb 调试内核" rel="next">
+        <a href="../memory-virtualization/" class="md-footer__link md-footer__link--next" aria-label="Next: 内存虚拟化" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              gdb 调试内核
+              内存虚拟化
             </div>
           </div>
           <div class="md-footer__button md-icon">

@@ -14,7 +14,7 @@
     
     
       
-        <title>Canonical address - pwn2death</title>
+        <title>内存虚拟化 - pwn2death</title>
       
     
     
@@ -64,6 +64,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -90,7 +95,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Canonical address
+              内存虚拟化
             
           </span>
         </div>
@@ -183,11 +188,65 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../memory-virtualization/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          内存虚拟化
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         内存虚拟化
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gpa-hva" class="md-nav__link">
+    gPA-hVA 表
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    影子页表
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ept" class="md-nav__link">
+    EPT
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -304,16 +363,98 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gpa-hva" class="md-nav__link">
+    gPA-hVA 表
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    影子页表
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ept" class="md-nav__link">
+    EPT
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                  <h1>Canonical address</h1>
-                
-                <p>目前，64 位的虚拟地址实际只有低 48 位有效，剩下的高 16 位作为符号扩展使用。当高 16 位是低 48 位的符号扩展时，这样的虚拟地址被称为合规地址（canonical address）。访问不合规地址将触发 #GP 异常。</p>
-<p>高 16 位作为符号扩展位并不是永久的，虚拟地址的有效位可能会更长，取决于体系结构。如开启五级页表的话，虚拟地址低 57 位均有效，此时合规检查就是判断高 7 位是否是低 57 位的符号扩展。</p>
+                <h1 id="_1">内存虚拟化</h1>
+<p>在虚拟化环境中，guest 和 host 拥有各自的地址空间：</p>
+<ul>
+<li>guest 的虚拟地址 gVA 和物理地址 gPA；</li>
+<li>host 的虚拟地址 hVA 和物理地址 hPA。</li>
+</ul>
+<p>内存访问要经过 gVA-&gt;gPA-&gt;hVA-&gt;hPA 的地址转换。</p>
+<p>另外有一套描述方式 VA-&gt;PA-&gt;MA，即虚拟地址到物理地址到机器地址，对应 gVA-&gt;gPA-&gt;hPA。这是在不关心 host 上其他应用，只考虑 guest-VMM-host 这一层级结构时，暂时忽略了 hVA。</p>
+<h2 id="gpa-hva">gPA-hVA 表</h2>
+<p>早期的内存虚拟化使用 gPA-hVA 表完成 gVA 到 hPA 的转换。</p>
+<p>即在 guest 中，借助 guest 页表完成 gVA-&gt;gPA 的转换，然后让 guest 对 gPA 的访问陷入到 VMM 中，VMM 使用自己维护的 gPA-hVA 表将 gPA 转换为 hVA，而后借助 host 页表完成 hVA-&gt;hPA 的转换。</p>
+<p>gPA-hVA 表的典型实现是 KVM 的 kvm_memory_slot 结构。这种方式要求 guest 的每次内存访问都陷入 VMM，开销巨大，为此提出了影子页表。</p>
+<h2 id="_2">影子页表</h2>
+<p>影子页表（Shadow Page Table）是纯软件的实现方式，VMM 在其中维护 gVA-&gt;hPA 的映射。当 guest 将进程页表的基址写入 CR3 时，VMM 介入，将 CR3 写为对应影子页表的基址，这样物理 MMU 访问的始终是影子页表。</p>
+<p>影子页表未命中时，发生 page fault，陷入 VMM：</p>
+<ol>
+<li>VMM 查找 guest 页表，guest 页表也不命中，guest 进行缺页处理，更新 guest 页表；</li>
+<li>guest 页表设置了写保护，再次陷入 VMM，VMM 根据所写内容更新影子页表。</li>
+</ol>
+<p>随着系统运行，越来越多的 gVA 被访问，影子页表逐渐建立。而当影子页表命中时，就可以一次完成从 gVA 到 hPA 的转换，从而提高效率。</p>
+<p>但是，影子页表有两个重大缺陷：</p>
+<ol>
+<li>需要为 guest 的每个进程维护一张影子页表；</li>
+<li>需要 VMM 介入所有 page fault 和 guest 页表的更新。</li>
+</ol>
+<h2 id="ept">EPT</h2>
+<p>Intel 的 EPT，Enhanced Page Table 方案为 gPA-&gt;hPA 的转换提供硬件支持。AMD 有类似机制 NPT，Nested Page Table。</p>
+<p>EPT 方案引入专门的 EPT 页表，以及相应的 EPT Base Pointer 寄存器，负责存储 EPT 页表基址：</p>
+<ul>
+<li>gVA-&gt;gPA 的转换借助 guest 页表在 CR3 上进行；</li>
+<li>gPA-&gt;hPA 的转换借助 EPT 页表在 EPT Base Pointer 寄存器上进行。</li>
+</ul>
+<p>两次地址转换都通过硬件完成，互相独立，可以交替进行。每次寻址时，先使用 gVA 查询guest 顶级页表获得下级页表的 gPA，再查询 EPT 获得 gPA 对应的 hPA，访问该 hPA 即可取出下级页表，这样的一轮查询被称作 nested walk。多级页表下，每次寻址都需要多轮 nested walk。</p>
+<p>和影子页表一样，EPT 页表也是逐渐建立的。EPT 页表未命中时，发生 page fault，陷入 VMM，由 VMM 为目标 gPA 分配 hPA，并相应建立 EPT 表项。</p>
+<p>只有 EPT 页表的 page fault 会导致陷入 VMM，而 guest 页表的 page fault 直接在 guest 内部处理。因为使用的基址寄存器不同，这两类 page fault 是可区分的。</p>
+<p>EPT 方案解决了影子页表的两大缺陷：</p>
+<ol>
+<li>只需要为每个 guest 维护一张 EPT 页表；</li>
+<li>guest 页表的 page fault 由 guest 自己处理，不会陷入 VMM。</li>
+</ol>
                 
               
               
@@ -329,6 +470,41 @@
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../seccomp-bpf/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Seccomp BPF" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Seccomp BPF
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../kernel-debugging-qemu-busybox-gdb/" class="md-footer__link md-footer__link--next" aria-label="Next: gdb 调试内核" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              gdb 调试内核
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
